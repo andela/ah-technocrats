@@ -91,5 +91,4 @@ ENV/
 
 # SQLite3
 db.sqlite3
-authors/.DS_Store
-authors/apps/.DS_Store
+.DS_Store
