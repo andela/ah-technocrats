@@ -1,11 +1,6 @@
 ![license](https://img.shields.io/github/license/mashape/apistatus.svg)
-
+[![Coverage Status](https://coveralls.io/repos/github/andela/ah-technocrats/badge.svg?branch=develop)](https://coveralls.io/github/andela/ah-technocrats?branch=develop)
 [![Build Status](https://travis-ci.org/andela/ah-technocrats.svg?branch=develop)](https://travis-ci.org/andela/ah-technocrats)
-
-## Authors Haven 
-A Social platform for the creative at heart.
-
-
 
 Authors Haven - A Social platform for the creative at heart.
 
@@ -13,8 +8,31 @@ Authors Haven - A Social platform for the creative at heart.
 Create a community of like minded authors to foster inspiration and innovation
 by leveraging the modern web.
 
----
+# Prerequisite
 
+- [Python3.6](https://www.python.org/downloads/release/python-365/)
+- [Virtual Environment](https://virtualenv.pypa.io/en/stable/installation/)
+
+# Installation and Setup
+
+Clone the repository below
+
+```
+git clone https://github.com/andela/ah-technocrats.git
+git checkout  develop
+cd ah-technocrats
+```
+# Install required Dependencies
+
+    source venv/bin/activate
+    pip install -r requirements.txt
+
+# Run the application
+   
+    python manage.py makemigrations
+    python manage.py migrate
+    python manage.py runserver
+    
 ## API Spec
 The preferred JSON object to be returned by the API should be structured as follows:
 
@@ -161,11 +179,11 @@ If a request fails any validations, expect errors in the following format:
 }
 ```
 ### Other status codes:
-401 for Unauthorized requests, when a request requires authentication but it isn't provided
+401 for Unauthorized requests, when a request requires authentication but it isn’t provided
 
-403 for Forbidden requests, when a request may be valid but the user doesn't have permissions to perform the action
+403 for Forbidden requests, when a request may be valid but the user doesn’t have permissions to perform the action
 
-404 for Not found requests, when a resource can't be found to fulfill the request
+404 for Not found requests, when a resource can’t be found to fulfill the request
 
 
 Endpoints:
@@ -214,7 +232,7 @@ Required fields: `email`, `username`, `password`
 
 `GET /api/user`
 
-Authentication required, returns a User that's the current user
+Authentication required, returns a User that’s the current user
 
 ### Update User
 
@@ -398,7 +416,3 @@ No additional parameters required
 ### Get Tags
 
 `GET /api/tags`
-
-
-
-
