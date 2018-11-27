@@ -1,0 +1,28 @@
+language: python
+
+python:
+  - "3.6"
+
+services:
+  - postgresql
+
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+
+global:
+  - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
+
+script:
+  - ./manage.py makemigrations
+  - ./manage.py migrate
+  - coverage run --source=. manage.py test
+  - coverage report
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT -t coverage.py
+  - nyc report --reporter=html
+
+after_success:
+  - "coveralls"
+  - "codeclimate-test-reporter"
