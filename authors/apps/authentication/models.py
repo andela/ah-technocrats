@@ -112,3 +112,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         the user's real name, we return their username instead.
         """
         return self.username
+
+
+class BlacklistedToken(models.Model):
+    token = models.CharField(max_length=255, null=False)
