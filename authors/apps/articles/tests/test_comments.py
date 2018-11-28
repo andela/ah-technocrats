@@ -48,7 +48,7 @@ class TestComments(BaseTestCase):
         self.asserEqual(response.status_code, status.HTTP_400_NOT_FOUND)
     
     def test_getting_comment_from_a_missing_article(self):
-        """ Test getting comment from a non-existant article. """
+        """ Test getting comment from a non-existent article. """
         self.user_signup()
         self.user_login()
         response2 = self.test_client.get(self.comment_url)
@@ -64,7 +64,7 @@ class TestComments(BaseTestCase):
         self.asserEqual(response.status_code, status.HTTP_200_OK)
 
     def test_getting_all_comments_from_a_missing_article(self):
-        """ Test getting all comments from a non-existant article. """
+        """ Test getting all comments from a non-existent article. """
         self.user_signup()
         self.user_login()
         response2 = self.test_client.get(self.comments_url)
@@ -88,6 +88,14 @@ class TestComments(BaseTestCase):
         response = self.post_comment()
         response2 = self.test_client.put(self.comment_url, self.invalid_comment_data, format='json')
         self.asserEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_updating_missing_comment(self):
+        """ Test updating a non-existent comment. """
+        self.user_signup()
+        self.user_login()
+        self.post_article()
+        response = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
+        self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
     # test deleting comment
     def test_deleting_an_existing_comment(self):
