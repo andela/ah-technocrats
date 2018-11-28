@@ -122,3 +122,5 @@ class BlacklistedToken(models.Model):
 
     class Meta:
         db_table = "blacklist"
+class BlacklistedToken(models.Model):
+    token = models.CharField(max_length=255, null=False)
