@@ -141,5 +141,4 @@ class TestComments(BaseTestCase):
         response = self.post_comment()
         response2 = self.test_client.delete(self.comment_url)
         self.asserEqual(response2.status_code, status.HTTP_403_FORBIDDEN)
-
    

@@ -81,3 +81,4 @@ class BaseTestCase(TestCase):
                 format='json'
             )
         return res
+        
