@@ -118,7 +118,7 @@ class TestComments(BaseTestCase):
         
     # test deleting comment
     def test_deleting_an_existing_comment(self):
-        """ Method for testing deleting an existing comment."""
+        """ Method for testing deleting an existing comment. """
         self.user_signup()
         self.user_login()
         self.post_article()
@@ -127,7 +127,7 @@ class TestComments(BaseTestCase):
         self.asserEqual(response2.status_code, status.HTTP_200_OK)
 
     def test_deleting_a_non_existing_comment(self):
-        """ Method for testing deleting an existing comment."""
+        """ Method for testing deleting an existing comment. """
         self.user_signup()
         self.user_login()
         self.post_article()
