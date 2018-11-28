@@ -20,10 +20,19 @@ class TestComments(BaseTestCase):
         self.user_login()
         self.post_article()
         response = self.post_comment()
-        response2 = app.client.get(self.comment_url)
+        response2 = self.client.get(self.comment_url)
         self.asserEqual(response.status_code, status.HTTP_200_OK)
     
     # test updating comment
+    def test_updating_a_comment(self):
+        """ Test editing an existing comment. """
+        self.user_signup()
+        self.user_login()
+        self.post_article()
+        response = self.post_comment()
+        response2 = self.client.put(self.comment_url, self.new_comment_data, format='json')
+        self.asserEqual(response2.status_code, status.HTTP_200_OK)
+        
     # test deleting comment
 
    
