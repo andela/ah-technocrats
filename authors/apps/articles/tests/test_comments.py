@@ -62,6 +62,13 @@ class TestComments(BaseTestCase):
         response = self.post_comment()
         response2 = self.test_client.get(self.comments_url)
         self.asserEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_getting_all_comments_from_a_missing_article(self):
+        """ Test getting all comments from a non-existant article. """
+        self.user_signup()
+        self.user_login()
+        response2 = self.test_client.get(self.comments_url)
+        self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
     # test updating comment
     def test_updating_a_comment(self):
