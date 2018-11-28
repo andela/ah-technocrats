@@ -1,7 +1,14 @@
 ![license](https://img.shields.io/github/license/mashape/apistatus.svg)
-[![Build Status](https://travis-ci.org/andela/ah-technocrats.svg?branch=ch-travis-integration-161966599)](https://travis-ci.org/andela/ah-technocrats.svg?branch=ch-travis-integration-161966599)
+
+[![Build Status](https://travis-ci.org/andela/ah-technocrats.svg?branch=develop)](https://travis-ci.org/andela/ah-technocrats)
+
+## Authors Haven 
+A Social platform for the creative at heart.
+
+
 
 Authors Haven - A Social platform for the creative at heart.
+
 ## Vision
 Create a community of like minded authors to foster inspiration and innovation
 by leveraging the modern web.

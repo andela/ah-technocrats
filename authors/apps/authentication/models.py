@@ -113,6 +113,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.username
 
+    class Meta:
+        db_table = "users"
 
+
+class BlacklistedToken(models.Model):
+    token = models.CharField(max_length=255, null=False)
+
+    class Meta:
+        db_table = "blacklist"
 class BlacklistedToken(models.Model):
     token = models.CharField(max_length=255, null=False)
