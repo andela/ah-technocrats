@@ -29,14 +29,14 @@ class BaseTestCase(TestCase):
                             }}
         
         self.comment_data = { "comment": {
-                            "body": "His name was my name too."
+                            "body": "It's amazing how the universe is mysterious."
                         }}
 
         self.article_data = { "article": {
-                            "title": "How to train your dragon",
-                            "description": "Ever wonder how?",
-                            "body": "You have to believe",
-                            "tagList": ["reactjs", "angularjs", "dragons"]
+                            "title": "Taking a closer look at the cosmos",
+                            "description": "The universe as we know it.",
+                            "body": "Nana come on!....",
+                            "tagList": ["tests", "django", "monsters"]
                         }}
 
         self.new_comment_data = { "comment": {
