@@ -46,6 +46,13 @@ class TestComments(BaseTestCase):
         self.post_article()
         response = self.test_client.get(self.comment_url)
         self.asserEqual(response.status_code, status.HTTP_400_NOT_FOUND)
+    
+    def test_getting_comment_from_a_missing_article(self):
+        """ Test getting comment from a non-existant article. """
+        self.user_signup()
+        self.user_login()
+        response2 = self.test_client.get(self.comment_url)
+        self.asserEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_getting_all_comments(self):
         """ Test getting all comments to an article. """
