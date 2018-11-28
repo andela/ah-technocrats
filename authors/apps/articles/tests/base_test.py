@@ -15,6 +15,7 @@ class BaseTestCase(TestCase):
         self.login_url = reverse("authentication:user-login")
         self.articles_url = reverse("articles")
         self.comments_url = reverse("articles:comments")
+        self.comment_url = reverse("articles:comment")
         
         self.register_data = {'user': {
                                 "username": "nana",
