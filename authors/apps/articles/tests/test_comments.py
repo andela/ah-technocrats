@@ -18,19 +18,22 @@ class TestComments(BaseTestCase):
         self.user_signup()
         self.user_login()
         self.post_article()
-        response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
+        response = self.test_client.post(self.comment_url, 
+                self.invalid_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     def test_commenting_on_non_existing_article(self):
         """ Test commenting on a missing article.  """
         self.user_signup()
         self.user_login()
-        response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
+        response = self.test_client.post(self.comment_url, 
+                self.invalid_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
     def test_commenting_by_a_non_user(self):
         """ Test a non-user cannot comment. """
-        response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
+        response = self.test_client.post(self.comment_url,
+                self.invalid_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # test getting comment
@@ -81,7 +84,8 @@ class TestComments(BaseTestCase):
         self.user_login()
         self.post_article()
         response = self.post_comment()
-        response2 = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
+        response2 = self.test_client.put(self.comment_url, 
+                self.new_comment_data, format='json')
         self.asserEqual(response2.status_code, status.HTTP_200_OK)
     
     def test_updating_with_invalid_data(self):
@@ -90,7 +94,8 @@ class TestComments(BaseTestCase):
         self.user_login()
         self.post_article()
         response = self.post_comment()
-        response2 = self.test_client.put(self.comment_url, self.invalid_comment_data, format='json')
+        response2 = self.test_client.put(self.comment_url, 
+                self.invalid_comment_data, format='json')
         self.asserEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
     
     def test_updating_missing_comment(self):
@@ -98,14 +103,16 @@ class TestComments(BaseTestCase):
         self.user_signup()
         self.user_login()
         self.post_article()
-        response = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
+        response = self.test_client.put(self.comment_url, 
+                self.new_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_non_logged_in_user_cannot_update(self):
         """ Test a user has to login before updating. """
         self.user_signup()
         self.post_article()
-        response = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
+        response = self.test_client.put(self.comment_url, 
+                self.new_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         
