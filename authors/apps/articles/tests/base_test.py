@@ -38,6 +38,10 @@ class BaseTestCase(TestCase):
                             "body": "You have to believe",
                             "tagList": ["reactjs", "angularjs", "dragons"]
                         }}
+        self.new_comment_data = { "comment": {
+                    "body": "Awesome!!!"
+                }}
+
     def user_signup(self):
         """ Method for registering ba user for testing. """
         res = self.client.post(
