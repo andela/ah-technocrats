@@ -28,7 +28,11 @@ class TestComments(BaseTestCase):
         response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
-    
+    def test_commenting_by_a_non_user(self):
+        """ Test a non-user cannot comment. """
+        response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
+        self.asserEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     # test getting comment
     def test_getting_a_comment(self):
         """ Test getting a single comment successfully. """
@@ -96,6 +100,14 @@ class TestComments(BaseTestCase):
         self.post_article()
         response = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_non_logged_in_user_cannot_update(self):
+        """ Test a user has to login before updating. """
+        self.user_signup()
+        self.post_article()
+        response = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
+        self.asserEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
         
     # test deleting comment
     def test_deleting_an_existing_comment(self):
@@ -114,4 +126,13 @@ class TestComments(BaseTestCase):
         self.post_article()
         response = self.test_client.delete(self.comment_url)
         self.asserEqual(response.status_code, status.HTTP_404_OK)
+    
+    def test_non_logged_in_user_deletting_comment(self):
+        """ Test a user has to login before deleting. """
+        self.user_signup()
+        self.post_article()
+        response = self.post_comment()
+        response2 = self.test_client.delete(self.comment_url)
+        self.asserEqual(response2.status_code, status.HTTP_403_FORBIDDEN)
+
    
