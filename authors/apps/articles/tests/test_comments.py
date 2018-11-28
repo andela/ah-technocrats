@@ -107,5 +107,11 @@ class TestComments(BaseTestCase):
         response2 = self.test_client.delete(self.comment_url)
         self.asserEqual(response2.status_code, status.HTTP_200_OK)
 
-
+    def test_deleting_a_non_existing_comment(self):
+        """ Method for testing deleting an existing comment."""
+        self.user_signup()
+        self.user_login()
+        self.post_article()
+        response = self.test_client.delete(self.comment_url)
+        self.asserEqual(response.status_code, status.HTTP_404_OK)
    
