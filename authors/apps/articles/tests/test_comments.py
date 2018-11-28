@@ -12,6 +12,14 @@ class TestComments(BaseTestCase):
         self.post_article()
         response = self.post_comment()
         self.asserEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_comment_creation_with_invalid_data(self):
+        """ Test creating a comment using invalid data. """
+        self.user_signup()
+        self.user_login()
+        self.post_article()
+        response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
+        self.asserEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     # test getting comment
     def test_getting_a_comment(self):
@@ -20,7 +28,7 @@ class TestComments(BaseTestCase):
         self.user_login()
         self.post_article()
         response = self.post_comment()
-        response2 = self.client.get(self.comment_url)
+        response2 = self.test_client.get(self.comment_url)
         self.asserEqual(response.status_code, status.HTTP_200_OK)
     
     # test updating comment
@@ -30,7 +38,7 @@ class TestComments(BaseTestCase):
         self.user_login()
         self.post_article()
         response = self.post_comment()
-        response2 = self.client.put(self.comment_url, self.new_comment_data, format='json')
+        response2 = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
         self.asserEqual(response2.status_code, status.HTTP_200_OK)
         
     # test deleting comment
@@ -40,7 +48,7 @@ class TestComments(BaseTestCase):
         self.user_login()
         self.post_article()
         response = self.post_comment()
-        response2 = self.client.delete(self.comment_url)
+        response2 = self.test_client.delete(self.comment_url)
         self.asserEqual(response2.status_code, status.HTTP_200_OK)
 
 
