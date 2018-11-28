@@ -9,7 +9,7 @@ class BaseTestCase(TestCase):
     def setUp(self):
         """ Basic configurations for the tests. """
 
-        self.client = APIClient()
+        self.test_client = APIClient()
         #urls
         self.register_url = reverse("authentication:user-signup")
         self.login_url = reverse("authentication:user-login")
@@ -38,13 +38,18 @@ class BaseTestCase(TestCase):
                             "body": "You have to believe",
                             "tagList": ["reactjs", "angularjs", "dragons"]
                         }}
+
         self.new_comment_data = { "comment": {
                     "body": "Awesome!!!"
+                }}
+                
+        self.invalid_comment_data = { "comment": {
+                    "body": " "
                 }}
 
     def user_signup(self):
         """ Method for registering ba user for testing. """
-        res = self.client.post(
+        res = self.test_client.post(
         self.register_url,
         self.register_data,
         format="json")
@@ -53,7 +58,7 @@ class BaseTestCase(TestCase):
     
     def user_login(self):
         """ Method for logging in a user tor testing. """
-        res = self.client.post(
+        res = self.test_client.post(
         self.login_url,
         self.login_data,
         format='json')
@@ -61,7 +66,7 @@ class BaseTestCase(TestCase):
 
     def post_article(self):
         """ Post an article for testing. """
-        res = self.client.post(
+        res = self.test_client.post(
             self.articles_url,
             self.article_data,
             format='json'
@@ -70,7 +75,7 @@ class BaseTestCase(TestCase):
 
     def post_comment(self):
         """ Post comment to an article. """
-        res = self.client.post(
+        res = self.test_client.post(
                 self.comments_url,
                 self.comment_data,
                 format='json'
