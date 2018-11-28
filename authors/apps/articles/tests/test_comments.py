@@ -79,6 +79,15 @@ class TestComments(BaseTestCase):
         response = self.post_comment()
         response2 = self.test_client.put(self.comment_url, self.new_comment_data, format='json')
         self.asserEqual(response2.status_code, status.HTTP_200_OK)
+    
+    def test_updating_with_invalid_data(self):
+        """ Test updating comment using invalid data. """
+        self.user_signup()
+        self.user_login()
+        self.post_article()
+        response = self.post_comment()
+        response2 = self.test_client.put(self.comment_url, self.invalid_comment_data, format='json')
+        self.asserEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
         
     # test deleting comment
     def test_deleting_an_existing_comment(self):
