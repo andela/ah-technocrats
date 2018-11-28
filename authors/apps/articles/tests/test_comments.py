@@ -21,6 +21,14 @@ class TestComments(BaseTestCase):
         response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
         self.asserEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
+    def test_commenting_on_non_existing_article(self):
+        """ Test commenting on a missing article.  """
+        self.user_signup()
+        self.user_login()
+        response = self.test_client.post(self.comment_url, self.invalid_comment_data, format='json')
+        self.asserEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    
     # test getting comment
     def test_getting_a_comment(self):
         """ Test getting a single comment successfully. """
