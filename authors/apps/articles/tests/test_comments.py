@@ -38,6 +38,15 @@ class TestComments(BaseTestCase):
         response = self.post_comment()
         response2 = self.test_client.get(self.comment_url)
         self.asserEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_getting_all_comments(self):
+        """ Test getting all comments to an article. """
+        self.user_signup()
+        self.user_login()
+        self.post_article()
+        response = self.post_comment()
+        response2 = self.test_client.get(self.comments_url)
+        self.asserEqual(response.status_code, status.HTTP_200_OK)
     
     # test updating comment
     def test_updating_a_comment(self):
