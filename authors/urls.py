@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.urls import include, path
 from django.contrib import admin
-from rest_framework.schemas import get_schema_view
-from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
+from rest_framework_swagger.views import get_swagger_view
 
-schema_view = get_schema_view(title='AUTHORS HAVEN API', renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
+schema_view = get_swagger_view(title='AUTHORS HAVEN API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
