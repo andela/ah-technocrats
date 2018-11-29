@@ -15,9 +15,12 @@ Including another URLconf
 """
 from django.urls import include, path
 from django.contrib import admin
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='AUTHORS HAVEN API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(('authors.apps.authentication.urls', "api-authenticate"), namespace='authentication')),
+    path('', schema_view, name='docs')
 ]
-
