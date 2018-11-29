@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'authors.apps.authentication',
     'authors.apps.core',
+    'authors.apps.articles',
     'authors.apps.profiles',
     'rest_framework_swagger',
 ]
