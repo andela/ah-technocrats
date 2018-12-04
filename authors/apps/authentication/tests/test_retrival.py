@@ -3,7 +3,10 @@ import unittest
 from rest_framework import status
 from authors.apps.authentication.models import User
 from authors.base_file import BaseTestCase
+import unittest
 
+
+@unittest.skip("Skip this class")
 @unittest.skip("Not implemented")
 class TestRetrieveUser(BaseTestCase):
     """This class will test user"""
