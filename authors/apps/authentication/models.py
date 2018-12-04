@@ -8,6 +8,7 @@ from django.db import models
 import jwt
 
 from django.conf import settings
+from django.core.mail import send_mail
 
 
 class UserManager(BaseUserManager):
@@ -136,7 +137,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         except jwt.PyJWTError:
             token = ""
         return token
+    
+    @staticmethod
+    def decode_jwt(token):
+        """ Method for decoding token."""
+        # It takes the token, secret_key and algrithm
+        user_details = jwt.decode(token, settings.SECRET_KEY, algorithm='HS256')
+        return user_details
 
+    @staticmethod
+    def send_mail(subject, message, from_email, to_list):
+        """ Method for sending mail. """
+        # set-up mail for verification
+        # it constitutes subject, message, from_email, to_list, fail_silently
+        subject = subject
+        message = message
+        from_email = settings.EMAIL_HOST_USER
+        to_list = to_list
+        send_mail(subject, message, from_email, to_list, fail_silently=True)
+        
     @property
     def success(self):
         return "You were successfully logged in"

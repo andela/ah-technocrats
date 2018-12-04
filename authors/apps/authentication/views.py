@@ -2,6 +2,7 @@ import jwt, datetime
 from django.urls import reverse
 from django.conf import settings
 from django.core.mail import send_mail
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView,  CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -13,25 +14,78 @@ from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer, ResetPasswordRequestSerializer,
 )
+from .models import User
 
 
 class RegistrationAPIView(CreateAPIView):
+    """ Class for handling user registration. """
     # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
 
     def post(self, request):
+        """ Signup a new user. """
         user = request.data.get('user', {})
-
         # The create serializer, validate serializer, save serializer pattern
         # below is common and you will see it a lot throughout this course and
         # your own work later on. Get familiar with it.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        saved_user = serializer.save()
+        # Set-up mail for verification
+        # An email will be sent to the user so that they can confirm 
+        # The link in the email contains the token that will be decoded
+        if request.is_secure():
+            protocol = "https://"
+        else:
+            protocol = "http://"
+        token = saved_user.jwt_token
+        path = reverse('authentication:user-activate', kwargs={'token':token})
+        url = protocol + request.get_host() + path
+        subject = 'Thank you for signing up!'
+        message =""" 
+                Welcome. We are glad that you are a part of us. Just one more step and we are good to go.
+                Follow the link below to activate your account.
+                {} 
+                """.format(url)
+        from_email = settings.EMAIL_HOST_USER
+        to_list = [serializer.data['email']]
+        User.send_mail(subject, message, from_email, to_list)
+        part1 = "Thank you for signing up with Authors Haven. "
+        part2 = "Please head over to your email to verify your account."
+        message = part1 + part2
+        message2 = {'message': message,'data': serializer.data}
+        return Response(message2, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class UserActivationAPIView(APIView):
+    """ Activates a user after mail verification. """
+    permission_classes = (AllowAny,)
+    def get(self, request, token):
+        """ Method for getting user token and activating them. """
+        # After a successful registration, a user is activated through here
+        # The token that was created and sent is decoded to get the user
+        # The user's is_active attribute is then set to true
+        user = User.decode_jwt(token=token)
+        is_registered = User.objects.get(username=user['username'])
+        is_registered.is_active = True
+        is_registered.save()
+        # send confirmation mail
+        if request.is_secure():
+            protocol = "https://"
+        else:
+            protocol = "http://"
+        path = reverse('authentication:user-login')
+        url = protocol + request.get_host() + path
+        subject = 'Confirmed!!'
+        message = """ Welcome to Authors Haven. Stay tuned for amazing reads.\n
+        Follow the link bellow to login. \n   {}""".format(url)
+        from_email = settings.EMAIL_HOST_USER
+        to_list = [user['email']]
+        User.send_mail(subject, message, from_email, to_list)
+        message = "Your account has been confirmed. Proceed to login."
+        return Response(message, status=status.HTTP_200_OK)
 
 
 class LoginAPIView(CreateAPIView):
