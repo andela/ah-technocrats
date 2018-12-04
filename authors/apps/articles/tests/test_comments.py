@@ -1,9 +1,11 @@
 import unittest
 from rest_framework import status
 from .base_test import BaseTestCase
+import unittest
 
 
 @unittest.skip("Skip this class")
+@unittest.skip("Not implemented")
 class TestComments(BaseTestCase):
     """ Class for testing comments. """
 

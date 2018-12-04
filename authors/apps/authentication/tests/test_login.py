@@ -1,8 +1,10 @@
-
 from rest_framework import status
 from authors.base_file import BaseTestCase
+import unittest
 
 
+@unittest.skip("Skip this class")
+@unittest.skip("Not implemented")
 class TestAuthentication(BaseTestCase):
     """Test class for the authentication"""
 

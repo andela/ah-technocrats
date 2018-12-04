@@ -8,9 +8,9 @@ class BaseTestCase(TestCase):
     def setUp(self):
         """Basic configurations of the tests and data for mockups"""
         self.register_data = {'user': {
-            "username": "Jacob",
+            "username": "Jacob-Saudi",
             "email": "jake@jake.jake",
-            "password": "jakejake"
+            "password": "Ajakejake12#"
         }}
 
         self.login_data = {
