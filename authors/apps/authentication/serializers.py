@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers, validators
 
 from .models import User
+from authors.apps.profiles.serializers import ProfileSerializer
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -106,6 +107,7 @@ class LoginSerializer(serializers.Serializer):
         # we pass `email` as the `username` value. Remember that, in our User
         # model, we set `USERNAME_FIELD` as `email`.
         user = authenticate(username=email, password=password)
+
         # If no user was found matching this email/password combination then
         # `authenticate` will return `None`. Raise an exception in this case.
         if user is None:
@@ -139,6 +141,7 @@ class UserSerializer(serializers.ModelSerializer):
     # characters. These values are the default provided by Django. We could
     # change them, but that would create extra work while introducing no real
     # benefit, so let's just stick with the defaults.
+    profile = ProfileSerializer(write_only=True)
     password = serializers.CharField(
         max_length=128,
         min_length=8,
@@ -147,8 +150,24 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password')
+        fields = (
+            'username',
+            'email',
+            'password',
+            'created_at',
+            'bio',
+            'profile',
+            'country',
+            'avatar',
+            'phone',
+            'website',
+        )
 
+    bio = serializers.CharField(source='profile.bio')
+    avatar = serializers.CharField(source='profile.avatar')
+    phone = serializers.CharField(source='profile.phone')
+    website = serializers.CharField(source='profile.website')
+    country = serializers.CharField(source='profile.country')
         # The `read_only_fields` option is an alternative for explicitly
         # specifying the field with `read_only=True` like we did for password
         # above. The reason we want to use `read_only_fields` here is because
@@ -166,7 +185,11 @@ class UserSerializer(serializers.ModelSerializer):
         # here is that we need to remove the password field from the
         # `validated_data` dictionary before iterating over it.
         password = validated_data.pop('password', None)
-
+        profile_data = validated_data.pop('profile', {})
+        for (key, value) in profile_data.items():
+            setattr(instance.profile, key, value)
+        instance.profile.save() # save the user profile
+        
         for (key, value) in validated_data.items():
             # For the keys remaining in `validated_data`, we will set them on
             # the current `User` instance one at a time.
