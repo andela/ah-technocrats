@@ -1,9 +1,10 @@
 """File to test user retrival"""
+import unittest
 from rest_framework import status
 from authors.apps.authentication.models import User
 from authors.base_file import BaseTestCase
 
-
+@unittest.skip("Not implemented")
 class TestRetrieveUser(BaseTestCase):
     """This class will test user"""
 

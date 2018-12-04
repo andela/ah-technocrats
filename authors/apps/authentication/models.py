@@ -1,7 +1,13 @@
+import datetime
+import os
+
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 from django.db import models
+import jwt
+
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -25,7 +31,6 @@ class UserManager(BaseUserManager):
         user = self.model(username=username, email=self.normalize_email(email))
         user.set_password(password)
         user.save()
-
         return user
 
     def create_superuser(self, username, email, password):
@@ -112,6 +117,29 @@ class User(AbstractBaseUser, PermissionsMixin):
         the user's real name, we return their username instead.
         """
         return self.username
+
+    @property
+    def jwt_token(self):
+        """Generate a user token"""
+        try:
+            token = jwt.encode({
+                "id": self.pk,
+                'fullnames': self.get_full_name,
+                'username': self.get_short_name(),
+                'email': self.email,
+                'iat': datetime.datetime.utcnow(),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=int(
+                    os.getenv("EXPIRES_AFTER", 15)
+                ))
+
+            }, settings.SECRET_KEY, algorithm="HS256").decode()
+        except jwt.PyJWTError:
+            token = ""
+        return token
+
+    @property
+    def success(self):
+        return "You were successfully logged in"
 
     class Meta:
         db_table = "users"

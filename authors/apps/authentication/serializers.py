@@ -7,7 +7,6 @@ from .models import User
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
-
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
     password = serializers.CharField(
@@ -15,7 +14,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         min_length=8,
         write_only=True
     )
-
+    token = serializers.CharField(max_length=1028,
+                                  read_only=True)
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
 
@@ -23,17 +23,22 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password']
+        fields = ['email', 'username', 'password', 'token', ]
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
-        return User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
+    """The class to serialize login details"""
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
+    # A property to hold the token when a user
+    # logs in
+    token = serializers.CharField(max_length=1028, read_only=True)
 
     def validate(self, data):
         # The `validate` method is where we make sure that the current
@@ -63,7 +68,6 @@ class LoginSerializer(serializers.Serializer):
         # we pass `email` as the `username` value. Remember that, in our User
         # model, we set `USERNAME_FIELD` as `email`.
         user = authenticate(username=email, password=password)
-
         # If no user was found matching this email/password combination then
         # `authenticate` will return `None`. Raise an exception in this case.
         if user is None:
@@ -86,7 +90,7 @@ class LoginSerializer(serializers.Serializer):
         return {
             'email': user.email,
             'username': user.username,
-
+            'token': user.jwt_token,
         }
 
 
