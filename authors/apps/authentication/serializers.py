@@ -184,3 +184,12 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
+
+class ResetPasswordRequestSerializer(RegistrationSerializer):
+    # We have subclassed the RegistrationSerializer class to reuse the validation
+    # regex constraints
+    class Meta:
+        model = User 
+        fields = ('password',)
+
+

@@ -164,3 +164,9 @@ SWAGGER_SETTINGS = {
       }
   }
 }
+# These settings may have to be passed as environment settings and removed from here
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'no.reply.technocrats@gmail.com'
+EMAIL_HOST_PASSWORD = 'technocrats123'
+EMAIL_PORT = 587
