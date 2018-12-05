@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from .models import Profile
 from .serializers import ProfileSerializer
 from .exceptions import ProfileNotFound
@@ -24,3 +24,4 @@ class RetrieveProfileAPIView(RetrieveAPIView):
         return Response({
             'profile': serializer.data
         }, status = status.HTTP_200_OK)
+
