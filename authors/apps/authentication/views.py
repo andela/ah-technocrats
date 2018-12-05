@@ -1,21 +1,20 @@
-import jwt, datetime
-from django.urls import reverse
+import datetime
+import jwt
 from django.conf import settings
 from django.core.mail import send_mail
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView,  CreateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import user_logged_in
-from .models import User
 
+from .models import User
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer, ResetPasswordRequestSerializer,
 )
-from .models import User
 
 
 class RegistrationAPIView(CreateAPIView):
@@ -33,7 +32,7 @@ class RegistrationAPIView(CreateAPIView):
         # your own work later on. Get familiar with it.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-        saved_user = serializer.save()
+        serializer.save()
         # Set-up mail for verification
         # An email will be sent to the user so that they can confirm 
         # The link in the email contains the token that will be decoded
@@ -41,11 +40,16 @@ class RegistrationAPIView(CreateAPIView):
             protocol = "https://"
         else:
             protocol = "http://"
-        token = saved_user.jwt_token
-        path = reverse('authentication:user-activate', kwargs={'token':token})
+        modeled_user = User(
+            username=serializer.data.get("username", ''),
+            email=serializer.data.get("email", ''),
+        )
+        # Get the actual token from the model
+        token = modeled_user.jwt_token
+        path = reverse('authentication:user-activate', kwargs={'token': token})
         url = protocol + request.get_host() + path
         subject = 'Thank you for signing up!'
-        message =""" 
+        message = """ 
                 Welcome. We are glad that you are a part of us. Just one more step and we are good to go.
                 Follow the link below to activate your account.
                 {} 
@@ -56,13 +60,17 @@ class RegistrationAPIView(CreateAPIView):
         part1 = "Thank you for signing up with Authors Haven. "
         part2 = "Please head over to your email to verify your account."
         message = part1 + part2
-        message2 = {'message': message,'data': serializer.data}
+        # Add token and message to the response so we
+        # get a JSON object with the token as a return value
+        # to the view
+        message2 = {'message': message, 'data': serializer.data, "token": token}
         return Response(message2, status=status.HTTP_201_CREATED)
 
 
 class UserActivationAPIView(APIView):
     """ Activates a user after mail verification. """
     permission_classes = (AllowAny,)
+
     def get(self, request, token):
         """ Method for getting user token and activating them. """
         # After a successful registration, a user is activated through here
@@ -103,11 +111,9 @@ class LoginAPIView(CreateAPIView):
         # handles everything we need.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-
         user = User.objects.filter(email = user['email'])
         user = user[0]
         user_logged_in.send(sender=type(user), request=request,user=user)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -215,7 +221,7 @@ class ChangePasswordView(APIView):
     # We then call the set_password method to create the password and then save.
     permission_classes = (AllowAny,)
     serializer_class = ResetPasswordRequestSerializer
-    
+
     def put(self, request, token, *args, **kwargs):
         try:
             new_password = request.data.get('password')
