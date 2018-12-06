@@ -8,6 +8,7 @@ from rest_framework.generics import RetrieveUpdateAPIView,  CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth import user_logged_in
 from .models import User
 
 from .renderers import UserJSONRenderer
@@ -103,6 +104,10 @@ class LoginAPIView(CreateAPIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
 
+        user = User.objects.filter(email = user['email'])
+        user = user[0]
+        user_logged_in.send(sender=type(user), request=request,user=user)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -120,7 +125,19 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        serializer_data = request.data.get('user', {})
+        user_data = request.data.get('user', {})
+        serializer_data = {
+            'username': user_data.get('username', request.user.username),
+            'email': user_data.get('email', request.user.email),
+
+            'profile': {
+                'avatar': user_data.get('avatar', request.user.profile.avatar),
+                'bio': user_data.get('bio', request.user.profile.bio),
+                'country': user_data.get('country', request.user.profile.country),
+                'website': user_data.get('website', request.user.profile.website),
+                'phone': user_data.get('phone', request.user.profile.phone),
+            }
+        }
 
         # Here is that serialize, validate, save pattern we talked about
         # before.
@@ -130,7 +147,18 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        updated_fields = dict()
+        for k,v in user_data.items():
+            if k in serializer_data['profile']:
+                updated_fields.update({k:v})
+
+        response = {
+            "message":"Update successful",
+            "updated-fields":updated_fields,
+            "new-record":serializer_data
+        }
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class ForgotPasswordView(APIView):

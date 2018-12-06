@@ -8,7 +8,7 @@ class BaseTestCase(TestCase):
     def setUp(self):
         """Basic configurations of the tests and data for mockups"""
         self.register_data = {'user': {
-            "username": "Jacob-Saudi",
+            "username": "Jacob",
             "email": "jake@jake.jake",
             "password": "Ajakejake12#"
         }}
@@ -16,7 +16,7 @@ class BaseTestCase(TestCase):
         self.login_data = {
             "user": {
                 "email": "jake@jake.jake",
-                "password": "jakejake"
+                "password": "Ajakejake12#"
             }
         }
         self.login_no_email = {
@@ -35,10 +35,6 @@ class BaseTestCase(TestCase):
         self.client = APIClient()
         self.register_url = reverse("authentication:user-signup")
         self.login_url = reverse("authentication:user-login")
-
         response = self.client.post(self.login_url, self.login_data, format='json')
-        # assert response.data.get("token")
-        # self.token = response.data["token"]
         self.token = "dummytokenhere"
-        # assert response.status_code == 200
         self.user_url = reverse('authentication:user-retrieve-profile')
