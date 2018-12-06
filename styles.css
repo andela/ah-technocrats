@@ -9,6 +9,23 @@
     
 }
 
+.image-login {
+    width: 300px;
+    margin: 0 auto;
+    padding-left:20px;
+
+}
+
+.auto {
+    width:200px;
+    margin: 0 auto;
+}
+
+.top-margin {
+    margin-top: 50px;
+}
+
+
 .login-image {
     width: 300px;
 }

@@ -8,18 +8,21 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Login | AuthorsHaven</title>
 </head>
-<body>
 
-    <div class="ui login container">      
-        <div class="ui sixteen wide column centered grid">
-            <div class="five wide column">
-                <div class="ui segment">
+    <div class="ui container top-margin">
+    <div class="ui segment">
+        <div class="ui grid column">
+        <img class="image-login" src="img/ah.logo-square.svg">
+        </div>
+        <div class="ui  segment">
 
-                    <img src="img/ah.logo-square.svg">
-                    <p>Please Login or <a href="signup.html">Sign Up.</a> </p> 
-                    <form action="index.html" class="ui left aligned form">
+          <div class="ui two column very centered relaxed stackable grid">
+            <div class="column">
+              <div class="ui form">
+                  <p>Please <b>Login</b> or <a href="signup.html"><b>Sign Up</b>.</a> If you forgot your password, <a href="password_reset.html"><b>Click Here</b>.</a></p>
+                <form action="index.html" class="ui left aligned form">
                         <div class="field">
                             <label class="form-label">Username:</label>
                             <input type="text" name="first-name" placeholder="Username">
@@ -34,12 +37,42 @@
                             <label>Keep me logged in.</label>
                             </div>
                         </div>
-                        <button class="ui button" type="submit">Submit</button>
+                        <button class="ui green fluid submit button">Login</button>
                     </form>
+              </div>
+            </div>
+            <div class="middle aligned column">
+
+               <div class="">
+                  <div class="ui big fluid facebook button">
+                    <i class="facebook icon"></i>
+                    Sign Up with Facebook
+                  </div>
+                </div>
+
+                <div class="space">
+                  <div class="ui big fluid google plus button">
+                    <i class="google icon"></i>
+                    Sign Up with Google
+                  </div>
+                </div>
+
+                <div class="space">
+                  <div class="ui big fluid twitter button">
+                    <i class="twitter icon"></i>
+                    Sign Up with Twitter
+                  </div>
                 </div>
             </div>
+          </div>
+          <div class="ui vertical divider">
+            Or
+          </div>
         </div>
     </div>
+    </div>
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
