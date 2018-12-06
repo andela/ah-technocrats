@@ -62,6 +62,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # or response, including fields specified explicitly above.
         fields = ['email', 'username', 'password', 'token', ]
 
+    token = serializers.CharField(
+        max_length=128,
+        read_only=True
+    )
+
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'password', 'token')
+
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
         user = User.objects.create_user(**validated_data)
@@ -147,6 +156,10 @@ class UserSerializer(serializers.ModelSerializer):
         min_length=8,
         write_only=True
     )
+    token = serializers.CharField(
+        max_length=128,
+        read_only=True
+    )
 
     class Meta:
         model = User
@@ -161,6 +174,7 @@ class UserSerializer(serializers.ModelSerializer):
             'avatar',
             'phone',
             'website',
+            'token',
         )
 
     bio = serializers.CharField(source='profile.bio')
@@ -168,6 +182,7 @@ class UserSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(source='profile.phone')
     website = serializers.CharField(source='profile.website')
     country = serializers.CharField(source='profile.country')
+
         # The `read_only_fields` option is an alternative for explicitly
         # specifying the field with `read_only=True` like we did for password
         # above. The reason we want to use `read_only_fields` here is because
@@ -216,3 +231,8 @@ class ResetPasswordRequestSerializer(RegistrationSerializer):
         fields = ('password',)
 
 
+class SocialSerializer(serializers.Serializer):
+    """ Accepts the Oauth input acces token , and access_token_secret"""
+    provider = serializers.CharField(max_length=255, required=True)
+    access_token = serializers.CharField(max_length=4096, required=True, trim_whitespace=True)
+    access_token_secret = serializers.CharField(max_length=4096, required=False, trim_whitespace=True)

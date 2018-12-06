@@ -9,11 +9,16 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import user_logged_in
+from requests.exceptions import HTTPError
+from social_django.utils import load_strategy, load_backend
+from social_core.exceptions import MissingBackend
+from social.backends.oauth import BaseOAuth1, BaseOAuth2
+from .models import User
 
 from .models import User
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer, ResetPasswordRequestSerializer,
+    LoginSerializer, RegistrationSerializer, UserSerializer, ResetPasswordRequestSerializer, SocialSerializer
 )
 
 
@@ -236,3 +241,59 @@ class ChangePasswordView(APIView):
 
         except jwt.PyJWTError:
             return Response({"Error": "Invalid token. Please request a new password reset link."}, status=403)
+class SocialView(CreateAPIView):
+    """Login through social sites (Google, Twitter, Facebook)"""
+    permission_classes = (AllowAny,)
+    serializer_class = SocialSerializer
+    renderer_classes = (UserJSONRenderer,)
+
+    def create(self, request):
+        """Takes in the provider token and creates a new user if the user does not exist also retrieves the username and uses it to get the token"""
+        serializer = self.serializer_class(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        provider = serializer.data.get("provider")
+        authentic_user = request.user if not request.user.is_anonymous else None
+        # Django code to plug into Python Social Auth's functionality
+        strategy = load_strategy(request)
+        try:
+            # Get backend corresponding to provider.
+            backend = load_backend(strategy=strategy, name=provider, redirect_uri=None)
+            if isinstance(backend, BaseOAuth1):
+                # Get access_token and access token secret for Oauth1 used by Twitter
+                if "access_token_secret" in request.data:
+                    access_token = {
+                        'oauth_token': request.data['access_token'],
+                        'oauth_token_secret': request.data['access_token_secret']
+                    }
+                else:
+                    return Response(
+                        {"error": "Access token secret is required"}, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            elif isinstance(backend, BaseOAuth2):
+                # Get access token for OAuth2
+                access_token = serializer.data.get("access_token")
+
+        except MissingBackend:
+            return Response({"error": "The Provider is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = backend.do_auth(access_token, user=authentic_user)
+        except BaseException as error:
+            return Response({"error": str(error)}, status=status.HTTP_400_BAD_REQUEST)
+        if not user.is_active:
+            user.is_active = True
+            # Serialize the user.
+            user.save()
+        serializer = UserSerializer(user)
+        user_data = serializer.data
+        modeled_user = User(user_data["username"], user_data["email"])
+        user_data["token"] = modeled_user.jwt_token
+        return Response(user_data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
