@@ -61,6 +61,10 @@
     margin-top: 50px;
 }
 
+.small-space {
+    margin-top: 20px;
+}
+
 .space-bottom {
     margin-bottom:50px
 }
@@ -83,7 +87,7 @@
     display: block !important
 }
 
-.small,{    
+.small{
     font-family: 'Quicksand', sans-serif;
     font-size: 1em;
     color: grey

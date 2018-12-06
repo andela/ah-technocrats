@@ -11,15 +11,18 @@
     <title>Sign Up | AuthorsHaven</title>
 </head>
 <body>
+    <div class="ui container top-margin">
+        <div class="ui centered grid">
+    <div class="ui ten wide column segment">
+        <div class="ui grid column">
+        <img class="image-login" src="img/ah.logo-square.svg">
+        </div>
+        <div class="ui">
 
-    <div class="ui login container">      
-        <div class="ui sixteen wide column centered grid">
-            <div class="ten wide column">
-                <div class="ui segment">
-
-                    <img src="img/ah.logo-square.svg">
-                    <p>Please Sign up or <a href="login.html">Login.</a> </p> 
-                    <form action="index.html" class="ui left aligned form">
+          <div class="ui column centered grid">
+              <div class="ui ten wide column">
+            <form action="sign_up_email_sent.html" class="ui left space-bottom aligned form">
+                <h3>Please <b>Sign Up</b> or <a href="login.html"><b>Login</b>.</a></h3>
                         <div class="field">
                             <label class="form-label">Username:</label>
                             <input type="text" name="username" placeholder="Username">
@@ -36,18 +39,17 @@
                             <label class="form-label">Password:</label>
                             <input type="text" name="password" placeholder="Repeat Password">
                         </div>
-                        <div class="field">
-                            <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>Keep me logged in.</label>
-                            </div>
-                        </div>
-                        <button class="ui button" type="submit">Submit</button>
+
+                        <button class="ui fluid green button" type="submit">Submit</button>
                     </form>
-                </div>
-            </div>
+              </div>
+          </div>
         </div>
     </div>
+    </div>
+    </div>
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>

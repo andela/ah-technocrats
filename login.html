@@ -10,70 +10,55 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login | AuthorsHaven</title>
 </head>
-
+<body>
     <div class="ui container top-margin">
-    <div class="ui segment">
+        <div class="ui centered grid">
+    <div class="ui ten wide column segment">
         <div class="ui grid column">
         <img class="image-login" src="img/ah.logo-square.svg">
         </div>
-        <div class="ui  segment">
+        <div class="ui">
+          <div class="ui column centered grid">
+              <div class="ui ten wide column">
+            <div class="ui center aligned basic segment">
+            <h3>Please <b>Login</b> or <a href="signup.html"><b>Sign Up</b>.</a></h3>
+            <form action="index.html" class="ui left aligned form">
+            <div class="field">
+            <label class="form-label">Username:</label>
+            <input type="text" name="first-name" placeholder="Username">
+            </div>
+            <div class="field">
+            <label class="form-label">Password:</label>
+            <input type="text" name="last-name" placeholder="Password">
+            </div>
+            <div class="field">
+            <div class="ui checkbox">
+            <input type="checkbox" tabindex="0" class="hidden">
+            <label>Keep me logged in.</label>
+            </div>
+            </div>
+            <button class="ui green fluid submit button">Login</button>
+            </form>
+            <div class="small-space">
+            <p>If you forgot your password, <a href="forgot_password.html"><b>Click Here</b>.</a></p>
+            </div>
+        <div class="ui horizontal divider">
+        OR
+        </div>
+            <p><small>Use your social accounts to login</small></p>
+        <div class="ui fluid buttons">
 
-          <div class="ui two column very centered relaxed stackable grid">
-            <div class="column">
-              <div class="ui form">
-                  <p>Please <b>Login</b> or <a href="signup.html"><b>Sign Up</b>.</a> If you forgot your password, <a href="password_reset.html"><b>Click Here</b>.</a></p>
-                <form action="index.html" class="ui left aligned form">
-                        <div class="field">
-                            <label class="form-label">Username:</label>
-                            <input type="text" name="first-name" placeholder="Username">
-                        </div>
-                        <div class="field">
-                            <label class="form-label">Password:</label>
-                            <input type="text" name="last-name" placeholder="Password">
-                        </div>
-                        <div class="field">
-                            <div class="ui checkbox">
-                            <input type="checkbox" tabindex="0" class="hidden">
-                            <label>Keep me logged in.</label>
-                            </div>
-                        </div>
-                        <button class="ui green fluid submit button">Login</button>
-                    </form>
+            <button class="ui facebook button"><i class="facebook icon"></i></button>
+            <button class="ui google plus button"><i class="google icon"></i></button>
+            <button class="ui twitter button"><i class="twitter icon"></i></button>
+        </div>
+        </div>
               </div>
-            </div>
-            <div class="middle aligned column">
-
-               <div class="">
-                  <div class="ui big fluid facebook button">
-                    <i class="facebook icon"></i>
-                    Sign Up with Facebook
-                  </div>
-                </div>
-
-                <div class="space">
-                  <div class="ui big fluid google plus button">
-                    <i class="google icon"></i>
-                    Sign Up with Google
-                  </div>
-                </div>
-
-                <div class="space">
-                  <div class="ui big fluid twitter button">
-                    <i class="twitter icon"></i>
-                    Sign Up with Twitter
-                  </div>
-                </div>
-            </div>
-          </div>
-          <div class="ui vertical divider">
-            Or
           </div>
         </div>
     </div>
     </div>
-
-
-
+    </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
 </body>
