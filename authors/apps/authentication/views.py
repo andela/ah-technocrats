@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,7 +15,8 @@ from social_django.utils import load_strategy, load_backend
 from social_core.exceptions import MissingBackend
 from social.backends.oauth import BaseOAuth1, BaseOAuth2
 from .models import User
-
+from authors.apps.profiles.models import Profile
+from authors.apps.profiles.serializers import ProfileSerializer
 from .models import User
 from .renderers import UserJSONRenderer
 from .serializers import (
@@ -22,12 +24,17 @@ from .serializers import (
 )
 
 
-class RegistrationAPIView(CreateAPIView):
+class RegistrationAPIView(APIView):
     """ Class for handling user registration. """
     # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
+    # renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
+    
+    def get(self, request):
+        profiles = Profile.objects.all()
+        serializer= ProfileSerializer(profiles, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         """ Signup a new user. """
@@ -290,10 +297,4 @@ class SocialView(CreateAPIView):
         modeled_user = User(user_data["username"], user_data["email"])
         user_data["token"] = modeled_user.jwt_token
         return Response(user_data, status=status.HTTP_200_OK)
-
-
-
-
-
-
 

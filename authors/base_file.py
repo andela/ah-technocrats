@@ -38,3 +38,4 @@ class BaseTestCase(TestCase):
         response = self.client.post(self.login_url, self.login_data, format='json')
         self.token = "dummytokenhere"
         self.user_url = reverse('authentication:user-retrieve-profile')
+        self.user_author = reverse('authentication:user-signup')
