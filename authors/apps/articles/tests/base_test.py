@@ -10,34 +10,72 @@ class BaseTestCase(TestCase):
         """ Basic configurations for the tests. """
 
         self.test_client = APIClient()
-        #urls
+        # urls
         self.register_url = reverse("authentication:user-signup")
         self.login_url = reverse("authentication:user-login")
-        self.articles_url = reverse("articles")
-        self.comments_url = reverse("articles:comments")
-        self.comment_url = reverse("articles:comment")
+        self.articles_url = reverse("articles:articles")
         
-        self.register_data = {'user': {
-                                "username": "nana",
-                                "email": "nana@nana.nana",
-                                "password": "nana123"
-                            }}
+        self.register_data = {
+                            "user":{
+                                "username": "JohnDoe",
+                                "email": "John@andela.com",
+                                "password": "jaja12ldd34&56"
+                            }
+                            }
 
-        self.login_data = { "user": {
-                                "email": "nana@nana.nana",
-                                "password": "nana123"
-                            }}
+        self.register_data2 = {
+                            "user":{
+                                "username": "JohnDoe2",
+                                "email": "John2@andela.com",
+                                "password": "jaja12ldd34&56"
+                            }
+                            }
+
+        self.login_data = {
+                            "user":{
+                                "email": "John@andela.com",
+                                "password": "jaja12ldd34&56"
+                            }
+                            }
+
+        self.login_data2 = {
+                            "user":{
+                                "email": "John2@andela.com",
+                                "password": "jaja12ldd34&56"
+                            }
+                            }
         
         self.comment_data = { "comment": {
                             "body": "It's amazing how the universe is mysterious."
                         }}
 
-        self.article_data = { "article": {
-                            "title": "Taking a closer look at the cosmos",
-                            "description": "The universe as we know it.",
-                            "body": "Nana come on!....",
-                            "tagList": ["tests", "django", "monsters"]
-                        }}
+        self.article_data = {
+                            "article": {
+                                "title": "Hello world",
+                                "description": "Ever wonder how?",
+                                "body": "You have to believe"
+                            }
+                        }
+        self.article_update_data = {
+                            "article": {
+                                "title": "Hello HelloWorld",
+                                "description": "Ever wonder how?",
+                                "body": "You have to believe"
+                            }
+                        }
+        self.article_invalid_data = {
+                            "article": {
+                                "description": "Ever wonder how?",
+                                "body": "You have to believe"
+                            }
+                        }
+
+        self.article_invalid_data2 = {
+                            "article": {
+                                "description": "",
+                                "body": ""
+                            }
+                        }
 
         self.new_comment_data = { "comment": {
                     "body": "Awesome!!!"
@@ -62,7 +100,7 @@ class BaseTestCase(TestCase):
         self.login_url,
         self.login_data,
         format='json')
-        return res
+        return res.data['token']
 
     def post_article(self):
         """ Post an article for testing. """
@@ -82,3 +120,23 @@ class BaseTestCase(TestCase):
             )
         return res
         
+    def create_article(self):
+        """
+            Metrhgod to create articles for the first user
+        """
+        self.user_signup()
+        token = 'Token ' + self.user_login()
+        saved_article = self.test_client.post(self.articles_url, 
+                        self.article_data, format='json', 
+                        HTTP_AUTHORIZATION=token)
+        slug = saved_article.data['slug']
+        article_url = reverse("articles:get_article", kwargs={'slug':slug})
+        
+        return article_url, saved_article, token
+
+    def create_article_user2(self):
+        """Method to create articles for user 2"""
+        self.test_client.post(self.register_url ,self.register_data2, format='json')
+        login = self.test_client.post(self.login_url ,self.login_data2, format='json')
+        token = 'Token ' + login.data['token']       
+        return token

@@ -26,5 +26,6 @@ urlpatterns = [
     path('', schema_view, name='docs'),
     path('api/', include(('authors.apps.profiles.urls', 'api-profiles'), namespace='profiles')),
     path('oauth/', include('social_django.urls', namespace='social')),
+    path('api/', include(('authors.apps.articles.urls', 'api-articles'), namespace='articles')),
 
 ]
