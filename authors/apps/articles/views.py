@@ -1,22 +1,25 @@
-from django.shortcuts import render
-from rest_framework import permissions
-from rest_framework.generics import (
-    RetrieveUpdateAPIView, ListCreateAPIView, DestroyAPIView, UpdateAPIView
-)
-from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import (
-    AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.generics import (
+    ListCreateAPIView, DestroyAPIView, UpdateAPIView
 )
-from requests.exceptions import HTTPError
+from django.db.utils import Error
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly
+)
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from authors.apps.articles.models import Rating
+from .models import Article
+from .models import Comment, Reply
 from .permissions import IsOwnerOrReadOnly
-from .models import Article, Comment, Reply
+from .serializers import ArticleSerializer, ArticleAuthorSerializer
 from .serializers import (
-    ArticleSerializer, ArticleAuthorSerializer, CommentSerializer,
+    CommentSerializer,
     ReplySerializer
 )
+from .serializers import (
+    RatingSerializer)
 
 
 class ArticleAPIView(APIView):
@@ -30,15 +33,15 @@ class ArticleAPIView(APIView):
         Method for creating an article
         """
         article_data = request.data.get('article')
-        context = {'request':request}
+        context = {'request': request}
         serializer = ArticleSerializer(data=article_data, context=context)
         serializer.is_valid(raise_exception=True)
         saved_article = serializer.save()
         message = {'message': "The article '{}' has been successfully created.".format(saved_article.title),
-        'title':saved_article.title,
-        'slug': saved_article.article_slug}
+                   'title': saved_article.title,
+                   'slug': saved_article.article_slug}
         return Response(message, status=status.HTTP_201_CREATED)
-              
+
     def get(self, request):
         """
         Method for getting all articles.
@@ -46,11 +49,16 @@ class ArticleAPIView(APIView):
         # It gets a specific article using the slug that is provided in the url
         articles = Article.objects.all()
         if articles:
-            serializer = ArticleAuthorSerializer(articles, many=True)
-            message = {'message':"Articles found.", 'articles': serializer.data}
+            result = []
+            for article in articles:
+                individual = dict()
+                individual.update(ArticleAuthorSerializer(article).data)
+                individual.update({"rating": article.just_average})
+                result.append(individual)
+            message = {'message': "Articles found.", 'articles': result}
             return Response(message, status=status.HTTP_200_OK)
         else:
-            return Response({'message':"Articles not found"})
+            return Response({'message': "Articles not found"})
 
 
 class SpecificArticleAPIView(APIView):
@@ -59,18 +67,20 @@ class SpecificArticleAPIView(APIView):
     """
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
 
-    def get(self,request, slug):
+    def get(self, request, slug):
         """
         Method for getting one article.
         """
         article = Article.objects.get(article_slug=slug)
+        final = dict()
         serializer = ArticleAuthorSerializer(article)
-        message = {'message':"Article found.", 
-            'article':serializer.data}
+        final.update(serializer.data)
+        final.update({"rating": article.rating})
+        message = {'message': "Article found.", 'article': final}
         return Response(message, status=status.HTTP_200_OK)
 
     def put(self, request, slug):
-        
+
         """
         Method for editing an article.
         """
@@ -78,8 +88,8 @@ class SpecificArticleAPIView(APIView):
         # An article should be edited by the person who created it only.
         article = Article.objects.get(article_slug=slug)
         if request.user.pk != article.author_id:
-            return Response({'Error': "You are not allowed to perform this request."}, 
-                status=status.HTTP_403_FORBIDDEN)
+            return Response({'Error': "You are not allowed to perform this request."},
+                            status=status.HTTP_403_FORBIDDEN)
         data = request.data.get('article')
         serializer = ArticleSerializer(instance=article, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -87,7 +97,7 @@ class SpecificArticleAPIView(APIView):
         message = {
             'message': "Article has been successfully updated.",
             'article_title': article.title
-            }
+        }
         return Response(message, status=status.HTTP_200_OK)
 
     def delete(self, request, slug):
@@ -102,11 +112,12 @@ class SpecificArticleAPIView(APIView):
                     return Response(message, status=status.HTTP_403_FORBIDDEN)
             article_details.delete()
             message = {
-                'message':"article '{}' has been successfully deleted.".format(article_details.title)            
-                }
+                'message': "article '{}' has been successfully deleted.".format(article_details.title)
+            }
             return Response(message, status=status.HTTP_200_OK)
         except Exception:
-            return Response({'message':"article not found."})
+            return Response({'message': "article not found."})
+
 
 class CommentsListAPIView(ListCreateAPIView):
     """
@@ -136,7 +147,7 @@ class CommentsListAPIView(ListCreateAPIView):
             return Response({
                 'error': 'Article with that slug not found',
             }, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.serializer_class(data=comment_data, context= context)
+        serializer = self.serializer_class(data=comment_data, context=context)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         message = {
@@ -144,9 +155,9 @@ class CommentsListAPIView(ListCreateAPIView):
             'comment': serializer.data
         }
         return Response(message,
-            status=status.HTTP_201_CREATED
-        )
-    
+                        status=status.HTTP_201_CREATED
+                        )
+
     def list(self, request, article_slug=None):
         """
         return a list of all comments for an article
@@ -170,6 +181,7 @@ class CommentsListAPIView(ListCreateAPIView):
             Response({
                 'message': 'No comments found for this article'
             })
+
 
 class UpdateDestroyCommentsAPIView(DestroyAPIView, UpdateAPIView):
     """
@@ -223,6 +235,7 @@ class UpdateDestroyCommentsAPIView(DestroyAPIView, UpdateAPIView):
             'message': 'Comment Updated Successfully',
             'comment': serializer.data
         }, status=status.HTTP_200_OK)
+
 
 class ReplyListAPIView(ListCreateAPIView):
     """
@@ -279,7 +292,7 @@ class ReplyListAPIView(ListCreateAPIView):
             return Response({
                 'error': 'Comment with that ID does not exist'
             }, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.serializer_class(data=reply_data, context= context)
+        serializer = self.serializer_class(data=reply_data, context=context)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         message = {
@@ -287,9 +300,10 @@ class ReplyListAPIView(ListCreateAPIView):
             'reply': serializer.data
         }
         return Response(message,
-            status=status.HTTP_201_CREATED
-        )
-    
+                        status=status.HTTP_201_CREATED
+                        )
+
+
 class UpdateDestroyReplyAPIView(DestroyAPIView, UpdateAPIView):
     """
     delete a comment's reply or update a reply
@@ -299,11 +313,11 @@ class UpdateDestroyReplyAPIView(DestroyAPIView, UpdateAPIView):
     lookup_url_kwarg = 'reply_pk'
     serializer_class = CommentSerializer
     NO_COMMENT_ID = Response({
-                'error': 'Comment with that ID not found',
-            }, status=status.HTTP_404_NOT_FOUND)
+        'error': 'Comment with that ID not found',
+    }, status=status.HTTP_404_NOT_FOUND)
     NO_ARTICLE_SLUG = Response({
-                'error': 'Article with that slug not found',
-            }, status=status.HTTP_404_NOT_FOUND)
+        'error': 'Article with that slug not found',
+    }, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, article_slug=None, comment_pk=None, reply_pk=None):
         """
@@ -350,3 +364,62 @@ class UpdateDestroyReplyAPIView(DestroyAPIView, UpdateAPIView):
             'message': 'Reply Updated Successfully',
             'reply': serializer.data
         }, status=status.HTTP_200_OK)
+
+
+# Create your views here.
+
+
+class RatingsAPIView(APIView):
+    """The ratings view for handling http requests"""
+    serializer_class = RatingSerializer
+
+    def post(self, request, **kwargs):
+        slug = kwargs.get("slug", '')
+        article = Article.objects.filter(article_slug=slug).first()
+        response = ""
+        returned = [Response(dict(
+            errors=dict(
+                message="The article with slug %s does not exist" %
+                        slug)), status=status.HTTP_404_NOT_FOUND), None][article is not None]
+        valid_user = request.user
+        # valid_user = User.objects.get(email=user.get('email', 'not_there'))
+        # First check if the token is really having an associated
+        # user. Because sometimes an account might be deactivated or deleted
+        # before the token expires which might cause the application to save
+        # a rating for an Invalid user
+        rating = request.data.get('rating', None)
+        # In-case the user never provided the rating in the request
+        # throw an error
+        returned = [Response(dict(errors=dict(
+            message="Missing rating field"
+        )), status=status.HTTP_400_BAD_REQUEST), None][rating is not None]
+        rating = str(rating)
+        try:
+            rating = int(float(rating))
+        except ValueError:
+            rating = 0
+        if not 1 <= rating <= 5:
+            response = [dict(errors=
+                             dict(rating="Specify a valid rating between 1 and 5 inclusive")),
+                        response][response != '']
+            returned = [Response(response, status=status.HTTP_400_BAD_REQUEST), returned][returned is not None]
+
+        # Check if what was sent by the user is really a number
+        # if the number if None
+        try:
+            if returned is None:
+                obje, created = Rating.objects.update_or_create(user=valid_user,
+                                                                article=article,
+                                                                defaults={"value": rating,
+                                                                          'user_id': valid_user.id,
+                                                                          'article_id': article.id})
+                obje.save()
+                response = dict(article={"message": "You successfully rated the article %s %d/5!"
+                                                    % (article.title, obje.value)})
+                returned = Response(response, status=status.HTTP_201_CREATED)
+        except Error:
+            response = dict(errors={"message": "There was a problem sending the rating"
+                                               " try again later."})
+            returned = [Response(response, status=status.HTTP_503_SERVICE_UNAVAILABLE),
+                        returned][returned is not None]
+        return returned
