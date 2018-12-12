@@ -89,6 +89,21 @@ class BaseTestCase(TestCase):
         self.invalid_comment_data = { "comment": {
                     "body": " "
                 }}
+        self.reply_data = {
+            "reply":{
+                "body":"Nice work man"
+            }
+        }
+        self.invalid_reply_data = {
+            "reply": {
+                "body": ""
+            }
+        }
+        self.reply_data2 = {
+            "reply": {
+                "body":"This reply was updated"
+            }
+        }
 
     def user_signup(self):
         """ Method for registering ba user for testing. """
@@ -123,6 +138,14 @@ class BaseTestCase(TestCase):
                 HTTP_AUTHORIZATION=token
             )
         return response, token, url
+    
+    def post_reply(self, reply_data, comment_id, url, token):
+        return self.test_client.post(
+            url+str(comment_id)+'/replies/',
+            data=reply_data,
+            format='json',
+            HTTP_AUTHORIZATION=token
+        )
     
     def get_comments(self, token, url):
         """
