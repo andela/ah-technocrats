@@ -48,6 +48,11 @@ class BaseTestCase(TestCase):
         self.comment_data = { "comment": {
                             "body": "It's amazing how the universe is mysterious."
                         }}
+        self.comment_data2 = {
+            "comment":{
+                "body":"This is super fun."
+            }
+        }
 
         self.article_data = {
                             "article": {
@@ -101,24 +106,46 @@ class BaseTestCase(TestCase):
         self.login_data,
         format='json')
         return res.data['token']
-
-    def post_article(self):
-        """ Post an article for testing. """
-        res = self.test_client.post(
-            self.articles_url,
-            self.article_data,
-            format='json'
-        )
-        return res
-
-    def post_comment(self):
-        """ Post comment to an article. """
-        res = self.test_client.post(
-                self.comments_url,
-                self.comment_data,
-                format='json'
+    
+    def post_comment(self, comment_data):
+        """
+        post another comment"""
+        response = self.create_article()
+        article_slug = response[1].data['slug']
+        token = response[2]
+        url = reverse("articles:list-create-comment", kwargs={
+            'article_slug':article_slug
+        })
+        response = self.test_client.post(
+                url,
+                comment_data,
+                format='json',
+                HTTP_AUTHORIZATION=token
             )
-        return res
+        return response, token, url
+    
+    def get_comments(self, token, url):
+        """
+        get all the comments of an article slug
+        """
+        return self.test_client.get(
+            url,
+            format='json',
+            HTTP_AUTHORIZATION=token
+        )
+        
+    def create_comment(self, token, article_slug):
+        """ Post comment to an article. """
+        url = reverse("articles:list-create-comment", kwargs={
+            'article_slug':article_slug
+        })
+        response = self.test_client.post(
+                url,
+                self.comment_data,
+                format='json',
+                HTTP_AUTHORIZATION=token
+            )
+        return response
         
     def create_article(self):
         """
