@@ -14,14 +14,14 @@ class BaseTestCase(TestCase):
         self.register_url = reverse("authentication:user-signup")
         self.login_url = reverse("authentication:user-login")
         self.articles_url = reverse("articles:articles")
-        # self.article_url = reverse("articles:get_article", kwargs={slug:'slug'})
-        self.comments_url = ''#reverse("articles:comments")
-        self.comment_url = ''#reverse("articles:comment")
         self.likearticle_url = reverse("articles:like", kwargs={'slug':"salma123445"})
         self.dislikearticle_url = reverse("articles:dislike",  kwargs={'slug':"salma123445"})
+        self.comments_url = ''#reverse("articles:comments")
+        self.comment_url = ''#reverse("articles:comment")
+        self.favoritearticle_url = reverse("articles:favorite", kwargs={'slug':"salma123445"})
 
         self.register_data = {
-                            "user":{
+                                    "user":{
                                 "username": "JohnDoe",
                                 "email": "John@andela.com",
                                 "password": "jaja12ldd34&56"
@@ -175,6 +175,7 @@ class BaseTestCase(TestCase):
             )
         return response
         
+
     def create_article(self):
         """
             Metrhgod to create articles for the first user
@@ -188,6 +189,8 @@ class BaseTestCase(TestCase):
         article_url = reverse("articles:get_article", kwargs={'slug':slug})
         
         return article_url, saved_article, token
+
+        
 
     def create_article_user2(self):
         self.test_client.post(self.register_url ,self.register_data2, format='json')
@@ -216,3 +219,30 @@ class BaseTestCase(TestCase):
         dislike_url = reverse("articles:dislike", kwargs={'slug': slug})
 
         return dislike_url
+
+    def favorite_article(self):
+        """method to favorite articles"""
+        self.user_signup()
+        token = 'Token ' + self.user_login()
+        saved_article = self.test_client.post(self.articles_url,
+                                              self.article_data, format='json',
+                                              HTTP_AUTHORIZATION=token)
+        slug = saved_article.data['slug']
+        like_url = reverse("articles:favorite", kwargs={'slug': slug})
+
+        return like_url
+
+    def unfavorite_article(self):
+        """method to unfavorite articles"""
+        self.user_signup()
+        token = 'Token ' + self.user_login()
+        saved_article = self.test_client.post(self.articles_url,
+                                              self.article_data, format='json',
+                                              HTTP_AUTHORIZATION=token)
+        slug = saved_article.data['slug']
+        dislike_url = reverse("articles:dislike", kwargs={'slug': slug})
+
+        return dislike_url
+        favorite_url = reverse("articles:favorite", "articles:favorite",  kwargs={'slug': slug})
+
+        return favorite_url

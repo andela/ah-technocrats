@@ -76,6 +76,16 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
             user_id = request.user.id
             disliked = instance.dislikes.all().filter(id=user_id).count() == 1
         return {'dislikes': instance.dislikes.count(), 'User': disliked}
+    favorite = serializers.SerializerMethodField(read_only=True)
+
+    def favorite(self, instance):
+        """favorite an article"""
+        request = self.context.get('request')
+        favorite = False
+        if request is not None and request.user.is_authenticated:
+            user_id = request.user.id
+            favorite = instance.favorite.all().filter(id=user_id).count() == 1
+        return {'favoritesCount': instance.favorite.count(), 'favorite':favorite}
 
     class Meta:
         model = Article
