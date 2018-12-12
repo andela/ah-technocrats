@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from ..authentication.serializers import UserSerializer
-from .models import Article
+from .models import Article, Comment, Reply
+from authors.apps.profiles.serializers import ProfileSerializer
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -58,4 +59,87 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
+
+class ReplySerializer(serializers.ModelSerializer):
+    """
+    serialize reply model data
+    """
+    author = ProfileSerializer(required=False)
+    class Meta:
+        """
+        serializer attributes
+        """
+        model = Reply
+        exclude = ('comment',) 
+
+    def create(self, validated_data):
+        """
+        create a new reply for an article comment
+        """
+        return Reply.objects.create(
+            author=self.context['author'],
+            comment=self.context['comment'],
+            **validated_data
+        ) 
     
+    def update(self, instance, validated_data):
+        """
+        method for updating an comment's reply
+        """
+        instance.body = validated_data.get('body', instance.body)
+        instance.author = validated_data.get('author', instance.author)
+        instance.save()
+        return instance
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    class to serialize comments data
+    """
+    author = ProfileSerializer(required=False)
+    created_at = serializers.SerializerMethodField(method_name='get_formated_create_at')
+    last_update = serializers.SerializerMethodField(method_name='get_formated_last_update')
+    replies = ReplySerializer(many=True, read_only=True)
+
+    class Meta:
+        """
+        define serializer attributes
+        """
+        model = Comment
+        fields = (
+            'id',
+            'author',
+            'body',
+            'created_at',
+            'last_update',
+            'replies'
+        )
+
+    def create(self, validated_data):
+        """
+        create a new comment for an article
+        """
+        return Comment.objects.create(
+            author=self.context['author'],
+            article=self.context['article'],
+            **validated_data
+        )
+
+    def update(self, instance, validated_data):
+        """
+        method for updating an articles' comment
+        """
+        instance.body = validated_data.get('body', instance.body)
+        instance.author = validated_data.get('author', instance.author)
+        instance.save()
+        return instance
+
+    def get_formated_create_at(self, instance):
+        """
+        return formated create_at time for a comment
+        """
+        return instance.created_at.isoformat()
+    
+    def get_formated_last_update(self, instance):
+        """
+        return formated last_update time for a comment
+        """
+        return instance.last_update.isoformat()
