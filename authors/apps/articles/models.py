@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.text import slugify
 
 from ..authentication.models import User
+from authors.apps.profiles.models import Profile
 
 class Article(models.Model):
     """
@@ -41,3 +42,52 @@ class Article(models.Model):
         """
         self.article_slug = self.create_slug()
         super().save(*args,**kwargs)
+
+class Comment(models.Model):
+    """
+    comment model
+    """
+    body = models.TextField(
+        max_length=1000,
+        blank=False,
+        null=False,
+    )
+    article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, related_name='comments', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """"
+        order comments chronologically by date created and last update"""
+        ordering = ['-created_at', '-last_update']
+    
+    def __str__(self):
+        """
+        return comment body
+        """
+        return self.body
+
+class Reply(models.Model):
+    """
+    comment reply model
+    """
+    author = models.ForeignKey(Profile, related_name='reply', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    comment = models.ForeignKey(Comment, related_name='reply', on_delete=models.CASCADE)
+    body = models.TextField(
+        null=False,
+        blank=False,
+    )
+
+    def __str__(self):
+        """
+        return reply body
+        """
+        return self.body
+    
+    class Meta:
+        """
+        order replies chronologically by creation date
+        """
+        ordering = ['-created_at']
