@@ -22,12 +22,14 @@ from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer, ResetPasswordRequestSerializer, SocialSerializer
 )
+from .permissions import IsPostOrIsAuthenticated
+
 
 
 class RegistrationAPIView(APIView):
     """ Class for handling user registration. """
     # Allow any user (authenticated or not) to hit this endpoint.
-    permission_classes = (AllowAny,)
+    permission_classes = (IsPostOrIsAuthenticated,)
     # renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
     
