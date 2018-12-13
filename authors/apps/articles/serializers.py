@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
-from ..authentication.serializers import UserSerializer
-from .models import Article, Comment, Reply
 from authors.apps.profiles.serializers import ProfileSerializer
+from .models import Article, Rating
+from .models import Comment, Reply
+from ..authentication.serializers import UserSerializer
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -13,7 +14,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     description = serializers.CharField()
     body = serializers.CharField()
     author = serializers.HiddenField(
-        default = serializers.CurrentUserDefault()
+        default=serializers.CurrentUserDefault()
     )
 
     class Meta:
@@ -36,15 +37,16 @@ class ArticleSerializer(serializers.ModelSerializer):
         instance.title = data.get('title', instance.title)
         instance.description = data.get('description', instance.description)
         instance.body = data.get('body', instance.body)
-        instance.author_id = data.get('authors_id',instance.author_id)
+        instance.author_id = data.get('authors_id', instance.author_id)
         instance.save()
         return instance
 
-    def get_author(self,Article):
+    def get_author(self, Article):
         """
         Method to get the author of an article.
         """
         return Article.author.pk
+
 
 class ArticleAuthorSerializer(serializers.ModelSerializer):
     """
@@ -55,22 +57,25 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     body = serializers.CharField()
-    author = UserSerializer(read_only = True)
+    author = UserSerializer(read_only=True)
+
     class Meta:
         model = Article
         fields = '__all__'
+
 
 class ReplySerializer(serializers.ModelSerializer):
     """
     serialize reply model data
     """
     author = ProfileSerializer(required=False)
+
     class Meta:
         """
         serializer attributes
         """
         model = Reply
-        exclude = ('comment',) 
+        exclude = ('comment',)
 
     def create(self, validated_data):
         """
@@ -80,8 +85,8 @@ class ReplySerializer(serializers.ModelSerializer):
             author=self.context['author'],
             comment=self.context['comment'],
             **validated_data
-        ) 
-    
+        )
+
     def update(self, instance, validated_data):
         """
         method for updating an comment's reply
@@ -90,6 +95,8 @@ class ReplySerializer(serializers.ModelSerializer):
         instance.author = validated_data.get('author', instance.author)
         instance.save()
         return instance
+
+
 class CommentSerializer(serializers.ModelSerializer):
     """
     class to serialize comments data
@@ -137,9 +144,18 @@ class CommentSerializer(serializers.ModelSerializer):
         return formated create_at time for a comment
         """
         return instance.created_at.isoformat()
-    
+
     def get_formated_last_update(self, instance):
         """
         return formated last_update time for a comment
         """
         return instance.last_update.isoformat()
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(source='rating.value',
+                                      required=True, allow_null=False, )
+
+    class Meta:
+        model = Rating
+        fields = ('rating',)

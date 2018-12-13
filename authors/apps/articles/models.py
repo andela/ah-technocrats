@@ -1,9 +1,11 @@
 import uuid
+from functools import reduce
 from django.db import models
 from django.utils.text import slugify
 
 from ..authentication.models import User
 from authors.apps.profiles.models import Profile
+
 
 class Article(models.Model):
     """
@@ -20,7 +22,7 @@ class Article(models.Model):
     # auto_now is updated with change
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         """
         Return the article title.
@@ -35,13 +37,40 @@ class Article(models.Model):
         while Article.objects.filter(article_slug=slug).exists():
             slug = slug + '-' + uuid.uuid4().hex
         return slug
-    
+
     def save(self, *args, **kwargs):
         """
         Edit the save function to include the created slug.
         """
         self.article_slug = self.create_slug()
-        super().save(*args,**kwargs)
+        super().save(*args, **kwargs)
+
+    @property
+    def rating(self):
+        """Get the average rating of an article
+        including the distribution of the ratings"""
+        rated = Rating.objects.filter(article=self)
+        distributions = dict()
+        total = 0
+        for ratee in rated:
+            distributions[ratee.value] = distributions.setdefault(ratee.value, 0) + 1
+            total += ratee.value
+        counts = 1
+        if len(rated) > 0:
+            counts = len(rated)
+        rate = round(total / counts, 1)
+        individuals = distributions
+        average = {'average': rate}
+        final = dict()
+        final.update(average)
+        final.update({"distributions": individuals})
+        return final
+
+    @property
+    def just_average(self):
+        """Return just the average ratings without distributions"""
+        return self.rating.get('average')
+
 
 class Comment(models.Model):
     """
@@ -61,12 +90,13 @@ class Comment(models.Model):
         """"
         order comments chronologically by date created and last update"""
         ordering = ['-created_at', '-last_update']
-    
+
     def __str__(self):
         """
         return comment body
         """
         return self.body
+
 
 class Reply(models.Model):
     """
@@ -85,9 +115,21 @@ class Reply(models.Model):
         return reply body
         """
         return self.body
-    
+
     class Meta:
         """
         order replies chronologically by creation date
         """
         ordering = ['-created_at']
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    value = models.IntegerField(choices=zip(range(1, 6), (1, 6)))
+
+    class Meta:
+        db_table = "ratings"
+        # Create a unique key which is a combination of
+        # two fields
+        unique_together = ("article", "user")

@@ -37,7 +37,6 @@ class TestTokenGeneration(APITestCase):
                                    data=json.dumps(self.user2),
                                    content_type="application/json")
         self.assertEqual(posted.status_code, status.HTTP_201_CREATED)
-        print(content.data)
         self.assertEqual(content.status_code, status.HTTP_200_OK)
 
         token_from_login = content.data.get('token', '')
