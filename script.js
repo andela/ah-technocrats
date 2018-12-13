@@ -20,3 +20,32 @@ $('.ui.sidebar').sidebar({
   })
   .sidebar('attach events', '.menu .item');
 
+$('.ui.rating')
+  .rating()
+;
+try {
+    var simplemde = new SimpleMDE();
+}catch (e) {
+
+}
+
+$('.ui.dropdown')
+  .dropdown({
+    action: 'combo'
+  })
+;
+
+$('.ui.modal')
+  .modal({
+    closable  : false,
+    onDeny    : function(){
+      window.alert('Wait not yet!');
+      return false;
+    },
+    onApprove : function() {
+      window.alert('Approved!');
+    }
+  })
+  .modal('show')
+;
+

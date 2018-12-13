@@ -128,3 +128,69 @@ cursor: pointer;
     padding-top: 5px;
     font-size: 1em
 }
+
+div [class*="left float"] {
+  float: left;
+  margin-left: 0.25em;
+}
+
+div [class*="right float"] {
+  float: right;
+   margin-right: 0.25em;
+}
+
+.same-line{
+    margin-top: -40px;
+}
+
+@media screen and (max-width: 552px){
+    .logo{
+        display: none;
+    }
+    .image.logo-small{
+        display: inline!important;
+        margin-left: 20%;
+        width: 120px!important;
+        height: 80px!important;
+    }
+}
+@media screen and (max-width: 600px) and (min-width: 553px){
+    .logo{
+        margin-left: 10%;
+    }
+}
+
+@media screen and (max-width: 800px) and (min-width: 601px){
+    .logo{
+        margin-left: 12%;
+    }
+}
+
+@media screen and (min-width: 801px) and (max-width: 980px){
+    .logo{
+        margin-left: 25%;
+    }
+}
+
+@media screen and (min-width: 981px) and (max-width: 1100px){
+    .logo{
+        margin-left: 30%;
+    }
+}
+
+.logo-small{
+    display: none;
+}
+
+.text-center{
+    text-align: center!important;
+}
+
+.tick{
+    font-size: 10em!important;
+}
+
+.nav-pill{
+    margin-top: 20px;
+    margin-right: 2%!important;
+}
