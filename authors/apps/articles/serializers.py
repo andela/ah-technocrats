@@ -57,7 +57,25 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     body = serializers.CharField()
-    author = UserSerializer(read_only=True)
+    author = UserSerializer(read_only = True)
+
+    def likes(self, instance):
+        """method to return a user who has liked an article"""
+        request = self.context.get('request')
+        liked = False
+        if request is not None and request.user.is_authenticated:
+            user_id = request.user.id
+            liked = instance.likes.all().filter(id=user_id).count() == 1
+        return {'likes': instance.likes.count(), 'User': liked}
+
+    def dislikes(self, instance):
+        """method to return a user who has disliked an article"""
+        request = self.context.get('request')
+        disliked = False
+        if request is not None and request.user.is_authenticated:
+            user_id = request.user.id
+            disliked = instance.dislikes.all().filter(id=user_id).count() == 1
+        return {'dislikes': instance.dislikes.count(), 'User': disliked}
 
     class Meta:
         model = Article

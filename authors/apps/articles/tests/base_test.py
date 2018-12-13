@@ -10,11 +10,16 @@ class BaseTestCase(TestCase):
         """ Basic configurations for the tests. """
 
         self.test_client = APIClient()
-        # urls
+        #urls
         self.register_url = reverse("authentication:user-signup")
         self.login_url = reverse("authentication:user-login")
         self.articles_url = reverse("articles:articles")
-        
+        # self.article_url = reverse("articles:get_article", kwargs={slug:'slug'})
+        self.comments_url = ''#reverse("articles:comments")
+        self.comment_url = ''#reverse("articles:comment")
+        self.likearticle_url = reverse("articles:like", kwargs={'slug':"salma123445"})
+        self.dislikearticle_url = reverse("articles:dislike",  kwargs={'slug':"salma123445"})
+
         self.register_data = {
                             "user":{
                                 "username": "JohnDoe",
@@ -185,8 +190,29 @@ class BaseTestCase(TestCase):
         return article_url, saved_article, token
 
     def create_article_user2(self):
-        """Method to create articles for user 2"""
         self.test_client.post(self.register_url ,self.register_data2, format='json')
         login = self.test_client.post(self.login_url ,self.login_data2, format='json')
         token = 'Token ' + login.data['token']       
         return token
+
+    def like_article(self):
+        self.user_signup()
+        token = 'Token ' + self.user_login()
+        saved_article = self.test_client.post(self.articles_url,
+                                              self.article_data, format='json',
+                                              HTTP_AUTHORIZATION=token)
+        slug = saved_article.data['slug']
+        like_url = reverse("articles:like", kwargs={'slug': slug})
+
+        return like_url
+
+    def dislike_article(self):
+        self.user_signup()
+        token = 'Token ' + self.user_login()
+        saved_article = self.test_client.post(self.articles_url,
+                                              self.article_data, format='json',
+                                              HTTP_AUTHORIZATION=token)
+        slug = saved_article.data['slug']
+        dislike_url = reverse("articles:dislike", kwargs={'slug': slug})
+
+        return dislike_url
