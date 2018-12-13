@@ -20,10 +20,13 @@ from .serializers import (
 )
 from .serializers import (
     RatingSerializer)
+from .models import Article
+from .serializers import ArticleSerializer, ArticleAuthorSerializer
+from rest_framework.generics import UpdateAPIView
 
 
 class ArticleAPIView(APIView):
-    """ 
+    """
     Class for handling Article.
     """
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -423,3 +426,53 @@ class RatingsAPIView(APIView):
             returned = [Response(response, status=status.HTTP_503_SERVICE_UNAVAILABLE),
                         returned][returned is not None]
         return returned
+class LikeArticle(UpdateAPIView):
+    """Class for liking and un -liking an article"""
+    def update(self, request, slug):
+        """This method updates the liking of an article"""
+        try:
+            article = Article.objects.get(article_slug=slug)
+        except Article.DoesNotExist:
+            return Response({
+                'Error': 'Article does not exist'
+            }, status.HTTP_404_NOT_FOUND)
+
+        # gets the user of that specific session
+        user = request.user
+        # checks for the boolean value of liking an article
+        liked = bool(user in article.like.all())
+        if liked is True:
+            article.like.remove(user.id)
+            message = {"article": "You have unliked this article"}
+            return Response(message, status.HTTP_200_OK)
+
+        # if like is false, the article is liked
+        article.like.add(user.id)
+        message = {"article": "You have liked this article"}
+        return Response(message, status.HTTP_200_OK)
+
+
+class DislikeArticle(UpdateAPIView):
+    """Class for disliking and  un-disliking an article"""
+    def update(self, request, slug):
+        """This method updates the liking of an article"""
+        LikeArticle.update(self, request, slug)
+        article = Article.objects.filter(article_slug=slug).first()
+        if article is None:
+            return Response({
+                'Error': 'Article does not exist'
+            }, status.HTTP_404_NOT_FOUND)
+
+        # gets the user of that specific session
+        user = request.user
+        # checks for the boolean value of disliking an article
+        disliked = bool(user in article.dislike.all())
+        if disliked is True:
+            article.dislike.remove(user.id)
+            message = {"article": "This article has been un-disliked"}
+            return Response(message, status.HTTP_200_OK)
+
+        # if disike is false, the article is disliked
+        article.dislike.add(user.id)
+        message = {"article": "You have disliked this article"}
+        return Response(message, status.HTTP_200_OK)

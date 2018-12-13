@@ -22,6 +22,9 @@ class Article(models.Model):
     # auto_now is updated with change
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+      # add like and dislike field in the articles
+    like = models.ManyToManyField(User, blank=True, related_name='like')
+    dislike = models.ManyToManyField(User, blank=True, related_name='dislike')
 
     def __str__(self):
         """

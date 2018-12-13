@@ -4,6 +4,9 @@ from .views import ArticleAPIView, SpecificArticleAPIView, CommentsListAPIView, 
     UpdateDestroyCommentsAPIView, ReplyListAPIView, \
     UpdateDestroyReplyAPIView, RatingsAPIView
 
+from .views import ArticleAPIView, SpecificArticleAPIView, LikeArticle, DislikeArticle
+
+
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),
     path('articles/<slug>', SpecificArticleAPIView.as_view(), name='get_article'),
@@ -12,4 +15,6 @@ urlpatterns = [
     path('articles/<str:article_slug>/comments/<int:comment_pk>/replies/', ReplyListAPIView.as_view(), name='list-create-reply'),
     path('articles/<str:article_slug>/comments/<int:comment_pk>/replies/<int:reply_pk>/', UpdateDestroyReplyAPIView.as_view(), name='update-delete-reply' ),
     path('articles/<str:slug>/rate/', RatingsAPIView.as_view(), name='rate-article'),
+    path('articles/<slug>/like/', LikeArticle.as_view(), name='like'),
+    path('articles/<slug>/dislike/', DislikeArticle.as_view(), name='dislike')
 ]
