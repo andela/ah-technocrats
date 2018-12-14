@@ -13,6 +13,9 @@ $('#toggle').click(function(){
     $('.sidebar').sidebar('toggle');
 });
 
+$('.ui.radio.checkbox')
+  .checkbox()
+;
 
 
 $('.ui.sidebar').sidebar({

@@ -194,3 +194,6 @@ div [class*="right float"] {
     margin-top: 20px;
     margin-right: 2%!important;
 }
+.radio-space {
+    margin-top:10px;
+}
