@@ -13,6 +13,12 @@ class BaseTestCase(TestCase):
             "password": "Ajakejake12#"
         }}
 
+        self.register_data2 = {'user': {
+                "username": "JohnDoe",
+                "email": "joe@gmail.com",
+                "password": "Gokjhg12#"
+            }}
+
         self.login_data = {
             "user": {
                 "email": "jake@jake.jake",
@@ -39,3 +45,4 @@ class BaseTestCase(TestCase):
         self.token = "dummytokenhere"
         self.user_url = reverse('authentication:user-retrieve-profile')
         self.user_author = reverse('authentication:user-signup')
+        
