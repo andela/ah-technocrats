@@ -26,6 +26,8 @@ class Article(models.Model):
     like = models.ManyToManyField(User, blank=True, related_name='like')
     dislike = models.ManyToManyField(User, blank=True, related_name='dislike')
 
+    favorite = models.ManyToManyField(User, blank=True, related_name='favorite')
+    
     def __str__(self):
         """
         Return the article title.
