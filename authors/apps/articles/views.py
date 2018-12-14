@@ -74,13 +74,17 @@ class SpecificArticleAPIView(APIView):
         """
         Method for getting one article.
         """
-        article = Article.objects.get(article_slug=slug)
+        article = Article.objects.filter(article_slug=slug).first()
         final = dict()
         serializer = ArticleAuthorSerializer(article)
         final.update(serializer.data)
         final.update({"rating": article.rating})
         message = {'message': "Article found.", 'article': final}
+        if article is None:
+            return Response({"message": "Article not found, Please check your slug"}, status=status.HTTP_404_NOT_FOUND)
         return Response(message, status=status.HTTP_200_OK)
+
+
 
     def put(self, request, slug):
 
@@ -89,7 +93,9 @@ class SpecificArticleAPIView(APIView):
         """
         # A slug should be provided.
         # An article should be edited by the person who created it only.
-        article = Article.objects.get(article_slug=slug)
+        article = Article.objects.filter(article_slug=slug).first()
+        if article is None:
+            return Response({"message": "Article not found with that slug"}, status=status.HTTP_404_NOT_FOUND)
         if request.user.pk != article.author_id:
             return Response({'Error': "You are not allowed to perform this request."},
                             status=status.HTTP_403_FORBIDDEN)
