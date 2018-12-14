@@ -110,6 +110,14 @@ class BaseTestCase(TestCase):
             }
         }
 
+        self.valid_report_data = {
+            "report":1
+        }
+
+        self.invalid_report_data = {
+            "report": "not_valid"
+        }
+
     def user_signup(self):
         """ Method for registering ba user for testing. """
         res = self.test_client.post(
@@ -246,3 +254,9 @@ class BaseTestCase(TestCase):
         favorite_url = reverse("articles:favorite", "articles:favorite",  kwargs={'slug': slug})
 
         return favorite_url
+    def create_report(self, report):
+        article_url, response, token = self.create_article()
+        report_response = self.test_client.post(reverse('articles:report', kwargs={"slug": response.data['slug']}), data=report, format='json',
+                              HTTP_AUTHORIZATION=token)
+        return report_response
+

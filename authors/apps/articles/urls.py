@@ -1,14 +1,10 @@
 from django.urls import path
 
-from .views import ArticleAPIView, SpecificArticleAPIView, CommentsListAPIView, \
-    UpdateDestroyCommentsAPIView, ReplyListAPIView, \
-    UpdateDestroyReplyAPIView
-
-from .views import ArticleAPIView, SpecificArticleAPIView, FavoriteArticles, RatingsAPIView
-
-
 from .views import ArticleAPIView, SpecificArticleAPIView, LikeArticle, DislikeArticle
-
+from .views import CommentsListAPIView
+from .views import FavoriteArticles, UpdateDestroyCommentsAPIView, ReplyListAPIView, \
+    UpdateDestroyReplyAPIView, RatingsAPIView, \
+    ReportListAPIView, ReportArticleAPIView
 
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),
@@ -20,6 +16,7 @@ urlpatterns = [
     path('articles/<str:slug>/rate/', RatingsAPIView.as_view(), name='rate-article'),
     path('articles/<slug>/like/', LikeArticle.as_view(), name='like'),
     path('articles/<slug>/dislike/', DislikeArticle.as_view(), name='dislike'),
-    path('articles/<slug>', SpecificArticleAPIView.as_view(), name='get_article'),
-    path('articles/<slug>/favorite/', FavoriteArticles.as_view(), name='favorite')
+    path('articles/<slug>/favorite/', FavoriteArticles.as_view(), name='favorite'),
+    path('articles/<str:slug>/report/', ReportArticleAPIView.as_view(), name='report'),
+    path('articles/reports/', ReportListAPIView.as_view(), name='report-list'),
 ]

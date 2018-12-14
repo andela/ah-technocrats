@@ -1,28 +1,28 @@
+from rest_framework.generics import (
+    ListCreateAPIView, DestroyAPIView
+)
 from rest_framework import status
 from rest_framework.generics import (
-    ListCreateAPIView, DestroyAPIView, UpdateAPIView
+    ListCreateAPIView, DestroyAPIView
 )
-from django.db.utils import Error
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly
-)
+from rest_framework.generics import UpdateAPIView
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authors.apps.articles.models import Rating
 from .models import Article
-from .models import Comment, Reply
+from .models import Comment, Reply, ReportArticle
 from .permissions import IsOwnerOrReadOnly
 from .serializers import ArticleSerializer, ArticleAuthorSerializer
 from .serializers import (
     CommentSerializer,
-    ReplySerializer
+    ReplySerializer,
+    ReportArticleSerializer
 )
 from .serializers import (
     RatingSerializer)
-from .models import Article
-from .serializers import ArticleSerializer, ArticleAuthorSerializer
-from rest_framework.generics import UpdateAPIView
+from ..authentication.models import User
 
 
 class ArticleAPIView(APIView):
@@ -426,8 +426,11 @@ class RatingsAPIView(APIView):
             returned = [Response(response, status=status.HTTP_503_SERVICE_UNAVAILABLE),
                         returned][returned is not None]
         return returned
+
+
 class LikeArticle(UpdateAPIView):
     """Class for liking and un -liking an article"""
+
     def update(self, request, slug):
         """This method updates the liking of an article"""
         try:
@@ -454,6 +457,7 @@ class LikeArticle(UpdateAPIView):
 
 class DislikeArticle(UpdateAPIView):
     """Class for disliking and  un-disliking an article"""
+
     def update(self, request, slug):
         """This method updates the liking of an article"""
         LikeArticle.update(self, request, slug)
@@ -476,31 +480,73 @@ class DislikeArticle(UpdateAPIView):
         article.dislike.add(user.id)
         message = {"article": "You have disliked this article"}
         return Response(message, status.HTTP_200_OK)
-        
-class FavoriteArticles(UpdateAPIView):
-   """Class for making an article a favorite"""
-   serializer_class = ArticleSerializer
 
-   def update(self, request, slug):
-       """This method updates the making of an article a favorite"""
-       try:
-           article = Article.objects.get(article_slug=slug)
-       except Article.DoesNotExist:
-           return Response({
-               'Error': 'Article does not exist'
-           }, status.HTTP_404_NOT_FOUND)
+
+class FavoriteArticles(UpdateAPIView):
+    """Class for making an article a favorite"""
+    serializer_class = ArticleSerializer
+
+    def update(self, request, slug):
+        """This method updates the making of an article a favorite"""
+        try:
+            article = Article.objects.get(article_slug=slug)
+        except Article.DoesNotExist:
+            return Response({
+                'Error': 'Article does not exist'
+            }, status.HTTP_404_NOT_FOUND)
 
         # gets the user of that specific session
-       user = request.user
+        user = request.user
 
         # checks for the boolean value of making an article a favorite
-       confirm = bool(user in article.favorite.all())
-       if confirm is True:
-           article.favorite.remove(user.id)
-           message = {"Success": "You have removed this article from your favorites"}
-           return Response(message, status.HTTP_200_OK)
+        confirm = bool(user in article.favorite.all())
+        if confirm is True:
+            article.favorite.remove(user.id)
+            message = {"Success": "You have removed this article from your favorites"}
+            return Response(message, status.HTTP_200_OK)
 
         # if favoriting is false, the article is made a favorite
-       article.favorite.add(user.id)
-       message = {"Success": "This article is a favourite"}
-       return Response(message, status.HTTP_200_OK)
+        article.favorite.add(user.id)
+        message = {"Success": "This article is a favourite"}
+        return Response(message, status.HTTP_200_OK)
+
+
+class ReportListAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    serializer_class = ReportArticleSerializer
+
+    def get(self, request):
+        # TODO:  Catch empty result errors
+        query_set = ReportArticle.objects.all()
+        serializer = self.serializer_class(query_set, many=True)
+        reports = []
+        for i in range(len(serializer.data)):
+            single_report = {
+                "article": Article.objects.get(id=serializer.data[i]['article']).title,
+                "reported_by": User.objects.get(id=serializer.data[i]['reported_by']).username,
+                "report": ReportArticle.REPORT_CHOICES[serializer.data[i]['report']][1]
+            }
+            reports.append(single_report)
+        return Response({"reports": reports}, status=status.HTTP_200_OK)
+
+
+class ReportArticleAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ReportArticleSerializer
+
+    def post(self, request, **kwargs):
+        try:
+            article_slug = kwargs.get('slug')
+            article = Article.objects.get(article_slug=article_slug)
+            reported_by = request.user
+            report = request.data.get('report')
+            data = {"article": article.pk, "reported_by": reported_by.pk, "report": report}
+            serializer = self.serializer_class(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"Success": "You have submitted a report",
+                             "article": article.title,
+                             "report": ReportArticle.REPORT_CHOICES[int(report)][1]
+                             }, status=status.HTTP_201_CREATED)
+        except Article.DoesNotExist:
+            return Response({"Error": "That article does not exist"}, status=status.HTTP_404_NOT_FOUND)

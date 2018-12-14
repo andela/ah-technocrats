@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
 from authors.apps.profiles.serializers import ProfileSerializer
-from .models import Article, Rating
-from .models import Comment, Reply
+from .models import Article, Rating, ReportArticle, Comment, Reply
 from ..authentication.serializers import UserSerializer
+from ..authentication.models import User
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -187,3 +187,26 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ('rating',)
+
+        
+class ArticleAuthorSerializer(serializers.ModelSerializer):
+    """
+    Class to serialize article and return the full owner information.
+    """
+    title = serializers.CharField(max_length=200)
+    description = serializers.CharField()
+    body = serializers.CharField()
+    author = UserSerializer(read_only = True)
+    class Meta:
+        model = Article
+        fields = '__all__'
+
+
+class ReportArticleSerializer(serializers.ModelSerializer):
+    article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
+    reported_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    report = serializers.ChoiceField(choices=ReportArticle.REPORT_CHOICES)
+
+    class Meta:
+        model = ReportArticle
+        fields = ('article', 'reported_by', 'report')

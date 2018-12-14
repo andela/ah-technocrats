@@ -138,3 +138,31 @@ class Rating(models.Model):
         # Create a unique key which is a combination of
         # two fields
         unique_together = ("article", "user")
+        
+class ReportArticle(models.Model):
+    class Meta:
+        verbose_name = "Reported Article"
+        verbose_name_plural = "Reported Articles"
+
+    REPORT_CHOICES = (
+        (0, 'None'),
+        (1, 'Incites Violence'),
+        (2, 'Duplicate content'),
+        (3, 'Indecent Content'),
+        (4, 'Poorly Written')
+    )
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    report = models.IntegerField(blank=False, null=False, choices=REPORT_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def show_report(self):
+        choice = int(self.report)
+        return self.REPORT_CHOICES[choice]
+
+    def __str__(self):
+        user = self.reported_by
+        report = self.show_report()
+        article = self.article.title
+        return """Article Titled: "{}" was reported By User: {} for Report: {}""".format(article, user, report)
+
