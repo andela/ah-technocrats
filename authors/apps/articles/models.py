@@ -166,3 +166,21 @@ class ReportArticle(models.Model):
         article = self.article.title
         return """Article Titled: "{}" was reported By User: {} for Report: {}""".format(article, user, report)
 
+class BookMarkArticle(models.Model):
+    """
+    model for holding users bookmarks. Allow user to bookmark an article only once
+    """
+    class Meta:
+        """
+        allow user to bookmark an article only once
+        """
+        unique_together = ('article', 'user')
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='user', related_name='user')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, verbose_name='article', related_name='article')
+
+    def __str__(self):
+        """
+        return the name of the bookmarked article
+        """
+        return self.article.article_slug

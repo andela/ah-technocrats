@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from authors.apps.profiles.serializers import ProfileSerializer
-from .models import Article, Rating, ReportArticle, Comment, Reply
+from .models import Article, Rating, ReportArticle, Comment, Reply, BookMarkArticle
 from ..authentication.serializers import UserSerializer
 from ..authentication.models import User
+from rest_framework.validators import UniqueTogetherValidator
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -210,3 +211,15 @@ class ReportArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReportArticle
         fields = ('article', 'reported_by', 'report')
+
+class BookMarkArticleSerializer(serializers.ModelSerializer):
+    """
+    class to serialize bookmarked articles
+    """
+    article_slug = serializers.CharField(source='article.article_slug')
+    class Meta:
+        model = BookMarkArticle
+        fields = [
+            'article_slug',
+            'id'
+        ]

@@ -17,6 +17,7 @@ class BaseTestCase(TestCase):
         self.likearticle_url = reverse("articles:like", kwargs={'slug':"salma123445"})
         self.dislikearticle_url = reverse("articles:dislike",  kwargs={'slug':"salma123445"})
         self.comments_url = ''#reverse("articles:comments")
+        self.bookmarks_url = reverse('articles:get-bookmarks')
         self.comment_url = ''#reverse("articles:comment")
         self.favoritearticle_url = reverse("articles:favorite", kwargs={'slug':"salma123445"})
 
@@ -186,7 +187,7 @@ class BaseTestCase(TestCase):
 
     def create_article(self):
         """
-            Metrhgod to create articles for the first user
+            Method to create articles for the first user
         """
         self.user_signup()
         token = 'Token ' + self.user_login()
@@ -260,3 +261,14 @@ class BaseTestCase(TestCase):
                               HTTP_AUTHORIZATION=token)
         return report_response
 
+    def toogle_bookmarking_article(self, article_slug, token):
+        """
+        toggle bookmarking an article
+        """
+        url = reverse('articles:bookmark-article', kwargs={
+            'article_slug': article_slug
+        })
+        return self.test_client.post(
+            url,
+            HTTP_AUTHORIZATION=token,
+        )
