@@ -64,14 +64,16 @@ class BaseTestCase(TestCase):
                             "article": {
                                 "title": "Hello world",
                                 "description": "Ever wonder how?",
-                                "body": "You have to believe"
+                                "body": "You have to believe",
+                                "tags": ["react", "django", "redux"]
                             }
                         }
         self.article_update_data = {
                             "article": {
                                 "title": "Hello HelloWorld",
                                 "description": "Ever wonder how?",
-                                "body": "You have to believe"
+                                "body": "You have to believe",
+                                "tags": ["react", "django", "redux"]
                             }
                         }
         self.article_invalid_data = {
