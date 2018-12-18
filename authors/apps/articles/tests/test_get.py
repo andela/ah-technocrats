@@ -12,7 +12,6 @@ class TestGetArticle(BaseTestCase):
         self.create_article()
         response = self.client.get(self.articles_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], "Articles found.")
 
     def test_get_article(self):
         """test getting one article"""
