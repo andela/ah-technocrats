@@ -1,10 +1,10 @@
 import uuid
-from functools import reduce
+
 from django.db import models
 from django.utils.text import slugify
 
-from ..authentication.models import User
 from authors.apps.profiles.models import Profile
+from ..authentication.models import User
 
 
 class Article(models.Model):
@@ -22,12 +22,12 @@ class Article(models.Model):
     # auto_now is updated with change
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-      # add like and dislike field in the articles
+    # add like and dislike field in the articles
     like = models.ManyToManyField(User, blank=True, related_name='like')
     dislike = models.ManyToManyField(User, blank=True, related_name='dislike')
 
     favorite = models.ManyToManyField(User, blank=True, related_name='favorite')
-    
+
     def __str__(self):
         """
         Return the article title.
@@ -88,6 +88,10 @@ class Comment(models.Model):
     )
     article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE)
     author = models.ForeignKey(Profile, related_name='comments', on_delete=models.CASCADE)
+    # The beginning of the highlight
+    highlight_start = models.IntegerField(default=0)
+    # The end of the highlight
+    highlight_end = models.IntegerField(default=-1)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
 
@@ -138,7 +142,8 @@ class Rating(models.Model):
         # Create a unique key which is a combination of
         # two fields
         unique_together = ("article", "user")
-        
+
+
 class ReportArticle(models.Model):
     class Meta:
         verbose_name = "Reported Article"
@@ -165,6 +170,7 @@ class ReportArticle(models.Model):
         report = self.show_report()
         article = self.article.title
         return """Article Titled: "{}" was reported By User: {} for Report: {}""".format(article, user, report)
+
 
 class BookMarkArticle(models.Model):
     """
