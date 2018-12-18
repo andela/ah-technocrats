@@ -58,7 +58,7 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     body = serializers.CharField()
-    author = UserSerializer(read_only = True)
+    author = UserSerializer(read_only=True)
 
     def likes(self, instance):
         """method to return a user who has liked an article"""
@@ -77,6 +77,7 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
             user_id = request.user.id
             disliked = instance.dislikes.all().filter(id=user_id).count() == 1
         return {'dislikes': instance.dislikes.count(), 'User': disliked}
+
     favorite = serializers.SerializerMethodField(read_only=True)
 
     def favorite(self, instance):
@@ -86,7 +87,7 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
         if request is not None and request.user.is_authenticated:
             user_id = request.user.id
             favorite = instance.favorite.all().filter(id=user_id).count() == 1
-        return {'favoritesCount': instance.favorite.count(), 'favorite':favorite}
+        return {'favoritesCount': instance.favorite.count(), 'favorite': favorite}
 
     class Meta:
         model = Article
@@ -156,6 +157,8 @@ class CommentSerializer(serializers.ModelSerializer):
         return Comment.objects.create(
             author=self.context['author'],
             article=self.context['article'],
+            highlight_start=self.context['start'],
+            highlight_end=self.context['end'],
             **validated_data
         )
 
@@ -189,7 +192,7 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = ('rating',)
 
-        
+
 class ArticleAuthorSerializer(serializers.ModelSerializer):
     """
     Class to serialize article and return the full owner information.
@@ -197,7 +200,8 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     body = serializers.CharField()
-    author = UserSerializer(read_only = True)
+    author = UserSerializer(read_only=True)
+
     class Meta:
         model = Article
         fields = '__all__'

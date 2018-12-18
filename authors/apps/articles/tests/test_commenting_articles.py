@@ -54,7 +54,7 @@ class TestComments(BaseTestCase):
         response = self.client.post(
             url,
             data=self.invalid_comment_data,
-            format='json',
+            content_type='application/json',
             HTTP_AUTHORIZATION=token,
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
