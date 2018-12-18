@@ -2,9 +2,17 @@ from django.urls import path
 
 from .views import ArticleAPIView, SpecificArticleAPIView, LikeArticle, DislikeArticle
 from .views import CommentsListAPIView
-from .views import FavoriteArticles, UpdateDestroyCommentsAPIView, ReplyListAPIView, \
-    UpdateDestroyReplyAPIView, RatingsAPIView, \
-    ReportListAPIView, ReportArticleAPIView
+from .views import (
+    FavoriteArticles, UpdateDestroyCommentsAPIView, ReplyListAPIView,
+    UpdateDestroyReplyAPIView, RatingsAPIView,
+    ReportListAPIView, ReportArticleAPIView,
+    
+)
+from authors.apps.articles.extra_views import (
+    BookMarkCreateAPIView, 
+    BookMarkListAPIView
+)
+    
 
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),
@@ -19,4 +27,6 @@ urlpatterns = [
     path('articles/<slug>/favorite/', FavoriteArticles.as_view(), name='favorite'),
     path('articles/<str:slug>/report/', ReportArticleAPIView.as_view(), name='report'),
     path('articles/reports/', ReportListAPIView.as_view(), name='report-list'),
+    path('articles/<str:article_slug>/bookmark/', BookMarkCreateAPIView.as_view(), name='bookmark-article'),
+    path('articles/bookmarks/', BookMarkListAPIView.as_view(), name='get-bookmarks'),
 ]
