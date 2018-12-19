@@ -21,6 +21,7 @@ class Profile(models.Model):
     # Followers are those that follow the user
     # Following are for those that the user follows
     following = models.ManyToManyField("self", related_name="user_following", symmetrical=False)
+    notifications_enabled = models.BooleanField(default=True)
   
     def __str__(self):
         '''format the returned profile string'''
@@ -49,4 +50,3 @@ class Profile(models.Model):
         Get an author's followers.
         """
         return self.user_following.all()
-      

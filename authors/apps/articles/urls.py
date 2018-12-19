@@ -1,18 +1,12 @@
 from django.urls import path
 
-from .views import ArticleAPIView, SpecificArticleAPIView, LikeArticle, DislikeArticle
-from .views import CommentsListAPIView
-from .views import (
-    FavoriteArticles, UpdateDestroyCommentsAPIView, ReplyListAPIView,
-    UpdateDestroyReplyAPIView, RatingsAPIView,
-    ReportListAPIView, ReportArticleAPIView,
-    
-)
-from authors.apps.articles.extra_views import (
-    BookMarkCreateAPIView, 
-    BookMarkListAPIView
-)
-    
+from authors.apps.articles.views.articles import ArticleAPIView, SpecificArticleAPIView, LikeArticle, DislikeArticle
+from authors.apps.articles.views.bookmarks import BookMarkCreateAPIView, BookMarkListAPIView
+from authors.apps.articles.views.comments import CommentsListAPIView, UpdateDestroyCommentsAPIView
+from authors.apps.articles.views.favorites import FavoriteArticles
+from authors.apps.articles.views.ratings import RatingsAPIView
+from authors.apps.articles.views.reply import ReplyListAPIView, UpdateDestroyReplyAPIView
+from authors.apps.articles.views.report_articles import ReportArticleAPIView, ReportListAPIView
 
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),

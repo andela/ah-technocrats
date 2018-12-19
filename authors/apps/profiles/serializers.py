@@ -12,6 +12,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(allow_blank=True, required=False)
     created_at = serializers.DateTimeField()
     avatar = serializers.SerializerMethodField()
+    notifications_enabled = serializers.BooleanField()
 
     phone = serializers.RegexField(
         regex="^[0-9]",
@@ -35,7 +36,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             'phone',
             'bio',
             'created_at',
-            'avatar'
+            'avatar',
+            'notifications_enabled',
         )
 
     def get_avatar(self, object):

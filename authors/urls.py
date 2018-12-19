@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/', include(('authors.apps.profiles.urls', 'api-profiles'), namespace='profiles')),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('api/', include(('authors.apps.articles.urls', 'api-articles'), namespace='articles')),
+    path('api/', include(('authors.apps.notifications.urls', 'api-notifications'), namespace='notifications')),
 
 ]
