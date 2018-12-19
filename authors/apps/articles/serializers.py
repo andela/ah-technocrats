@@ -91,34 +91,34 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     body = serializers.CharField()
     author = UserSerializer(read_only = True)
     tags = serializers.SerializerMethodField(method_name='show_tags')
-    
+    like = serializers.SerializerMethodField(method_name='like_article')
+    dislike = serializers.SerializerMethodField(method_name='dislike_article')
+
 
     def show_tags(self, instance):
         """
         Show tag details.
         """
         return instance.tags.names()
-        
 
-    def likes(self, instance):
+
+    def like_article(self, instance):
         """method to return a user who has liked an article"""
         request = self.context.get('request')
         liked = False
+
         if request is not None and request.user.is_authenticated:
             user_id = request.user.id
-            liked = instance.likes.all().filter(id=user_id).count() == 1
-        return {'likes': instance.likes.count(), 'User': liked}
+        return {'likeCount': instance.like.count()}
 
-    def dislikes(self, instance):
+    def dislike_article(self, instance):
         """method to return a user who has disliked an article"""
         request = self.context.get('request')
         disliked = False
         if request is not None and request.user.is_authenticated:
             user_id = request.user.id
-            disliked = instance.dislikes.all().filter(id=user_id).count() == 1
-        return {'dislikes': instance.dislikes.count(), 'User': disliked}
+        return {'dislikeCount': instance.dislike.count()}
 
-    favorite = serializers.SerializerMethodField(read_only=True)
 
     def favorite(self, instance):
         """favorite an article"""

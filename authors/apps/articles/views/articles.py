@@ -183,6 +183,10 @@ class LikeArticle(UpdateAPIView):
             return Response(message, status.HTTP_200_OK)
 
         # if like is false, the article is liked
+        disliked = bool(user in article.dislike.all())
+        if disliked is True:
+            article.dislike.remove(user.id)
+
         article.like.add(user.id)
         message = {"article": "You have liked this article"}
         return Response(message, status.HTTP_200_OK)
@@ -192,10 +196,10 @@ class DislikeArticle(UpdateAPIView):
     """Class for disliking and  un-disliking an article"""
 
     def update(self, request, slug):
-        """This method updates the liking of an article"""
-        LikeArticle.update(self, request, slug)
-        article = Article.objects.filter(article_slug=slug).first()
-        if article is None:
+        """This method updates the disliking of an article"""
+        try:
+            article = Article.objects.get(article_slug=slug)
+        except Article.DoesNotExist:
             return Response({
                 'Error': 'Article does not exist'
             }, status.HTTP_404_NOT_FOUND)
@@ -210,6 +214,10 @@ class DislikeArticle(UpdateAPIView):
             return Response(message, status.HTTP_200_OK)
 
         # if disike is false, the article is disliked
+        liked = bool(user in article.like.all())
+        if liked is True:
+            article.like.remove(user.id)
+            
         article.dislike.add(user.id)
         message = {"article": "You have disliked this article"}
         return Response(message, status.HTTP_200_OK)
