@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.utils.text import slugify
+from taggit.managers import TaggableManager
 
 from authors.apps.profiles.models import Profile
 from ..authentication.models import User
@@ -15,6 +16,8 @@ class Article(models.Model):
     description = models.TextField(blank=False)
     body = models.TextField()
     image = models.URLField(blank=True)
+    # Article tags
+    tags = TaggableManager(blank=True)
     # slug is unique to an article
     article_slug = models.SlugField(unique=True, editable=False, max_length=255)
     author = models.ForeignKey(User, related_name='authorshaven', on_delete=models.CASCADE)

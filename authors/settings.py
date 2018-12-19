@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'authors.apps.profiles',
     'rest_framework_swagger',
     'social_django',
+    'taggit',
 ]
 
 MIDDLEWARE = [

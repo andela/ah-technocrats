@@ -40,18 +40,21 @@ class ArticleAPIView(APIView):
         saved_article = serializer.save()
         message = {'message': "The article '{}' has been successfully created.".format(saved_article.title),
                    'title': saved_article.title,
-                   'slug': saved_article.article_slug}
+                   'slug': saved_article.article_slug,
+                   'tags':saved_article.tags
+                   }
         return Response(message, status=status.HTTP_201_CREATED)
 
     def get(self, request):
         """
         Method for getting all articles.
         """
-        # It gets a specific article using the slug that is provided in the url
+        # It gets a specific all articles
         articles = Article.objects.all()
+        
         if articles:
             result = []
-            for article in articles:
+            for article in articles:                
                 individual = dict()
                 individual.update(ArticleAuthorSerializer(article).data)
                 individual.update({"rating": article.just_average})
