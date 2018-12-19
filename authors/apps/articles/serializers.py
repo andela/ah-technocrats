@@ -177,6 +177,22 @@ class CommentSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField(method_name='get_formated_create_at')
     last_update = serializers.SerializerMethodField(method_name='get_formated_last_update')
     replies = ReplySerializer(many=True, read_only=True)
+    likes = serializers.SerializerMethodField(method_name='comment_likes')
+    dislikes = serializers.SerializerMethodField(method_name='comment_dislikes')
+
+    def comment_likes(self, instance):
+        """method to return a user who has liked an article"""
+
+        return {
+            'count': instance.likes.count()
+        }
+
+    def comment_dislikes(self, instance):
+        """method to return a user who has disliked an article"""
+        
+        return {
+            'count': instance.dislikes.count()
+        }
 
     class Meta:
         """
@@ -189,7 +205,9 @@ class CommentSerializer(serializers.ModelSerializer):
             'body',
             'created_at',
             'last_update',
-            'replies'
+            'replies',
+            'likes',
+            'dislikes'
         )
 
     def create(self, validated_data):

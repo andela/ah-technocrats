@@ -185,7 +185,33 @@ class BaseTestCase(TestCase):
                 HTTP_AUTHORIZATION=token
             )
         return response
-        
+    
+    def like_comment_url(self, comment_pk):
+        """
+        return the url for liking a specific comment ID
+        """
+        return reverse('articles:like-comment', kwargs={
+            'comment_pk': comment_pk
+        })
+
+    def dislike_comment_url(self, comment_pk):
+        """
+        return the url for disking a specific comment ID
+        """
+        return reverse('articles:dislike-comment', kwargs={
+            'comment_pk': comment_pk
+        })
+
+    def get_comment_id(self):
+        """
+        return comment ID for liking and disliking a comment
+        """
+        self.user_signup()
+        token = self.user_login()
+        article_url, saved_article, token = self.create_article()
+        article_slug = saved_article.data['slug']
+        comment_response = self.create_comment(token, article_slug)
+        return comment_response.data['comment']['id'], token
 
     def create_article(self):
         """

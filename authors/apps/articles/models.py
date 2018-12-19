@@ -90,6 +90,7 @@ class Comment(models.Model):
         blank=False,
         null=False,
     )
+    # add like and dislike field in the comment
     article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE)
     author = models.ForeignKey(Profile, related_name='comments', on_delete=models.CASCADE)
     # The beginning of the highlight
@@ -98,6 +99,8 @@ class Comment(models.Model):
     highlight_end = models.IntegerField(default=-1)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(User, blank=True, related_name='likecomment')
+    dislikes = models.ManyToManyField(User, blank=True, related_name='dislikecomment')
 
     class Meta:
         """"
