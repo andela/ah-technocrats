@@ -184,6 +184,7 @@ class SpecificArticleAPIView(APIView):
         except Exception:
             return Response({'message': "article not found."})
 
+
 class LikeArticle(UpdateAPIView):
     """Class for liking and un -liking an article"""
 

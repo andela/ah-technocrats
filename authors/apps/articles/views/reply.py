@@ -7,6 +7,29 @@ from authors.apps.articles.models import Reply, Article, Comment
 from authors.apps.articles.serializers import ReplySerializer, CommentSerializer
 
 
+class CommentReplyChecker:
+
+    @staticmethod
+    def check_exists(comment_pk, article_slug, reply_id=None):
+        """Check if a comment or an article or a reply exists"""
+        article = Article.objects.filter(article_slug=article_slug).first()
+        comment = Comment.objects.filter(pk=comment_pk).first()
+        response = [None, Response({
+            'error': 'Article with this slug not found'
+        }, status=status.HTTP_404_NOT_FOUND)][article is None]
+        response = [response, Response({
+            'error': 'Comment with this ID not found'
+        }, status=status.HTTP_404_NOT_FOUND)][(response is None) and (comment is None)]
+        reply = [None, Reply.objects.filter(pk=reply_id).first()][reply_id is not None]
+        response = [response, Response({
+                'error': 'Reply with that ID not found',
+            }, status=status.HTTP_404_NOT_FOUND)][
+            (response is None) and (not reply) and (reply_id is not None)]
+        if response is not None:
+            return response
+        return [article, comment, reply]
+
+
 class ReplyListAPIView(ListCreateAPIView):
     """
     class to create and list comments replies
@@ -21,17 +44,9 @@ class ReplyListAPIView(ListCreateAPIView):
         """
         list replies for comment_id
         """
-        try:
-            Article.objects.get(article_slug=article_slug)
-            Comment.objects.get(pk=comment_pk)
-        except Article.DoesNotExist:
-            return Response({
-                'error': 'Article with this slug not found'
-            }, status=status.HTTP_404_NOT_FOUND)
-        except Comment.DoesNotExist:
-            return Response({
-                'error': 'Comment with this ID not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+        response = CommentReplyChecker.check_exists(comment_pk, article_slug)
+        if not isinstance(response, list):
+            return response
         replies = self.queryset.filter(comment__id=comment_pk)
         serializer = ReplySerializer(replies, many=True)
         data = serializer.data
@@ -51,17 +66,10 @@ class ReplyListAPIView(ListCreateAPIView):
         context = {
             'author': request.user.profile
         }
-        try:
-            Article.objects.get(article_slug=article_slug)
-            context['comment'] = Comment.objects.get(pk=comment_pk)
-        except Article.DoesNotExist:
-            return Response({
-                'error': 'Article with that slug not found',
-            }, status=status.HTTP_404_NOT_FOUND)
-        except Comment.DoesNotExist:
-            return Response({
-                'error': 'Comment with that ID does not exist'
-            }, status=status.HTTP_404_NOT_FOUND)
+        resp = CommentReplyChecker.check_exists(comment_pk, article_slug)
+        if not isinstance(resp, list):
+            return resp
+        context['comment'] = resp[1]
         serializer = self.serializer_class(data=reply_data, context=context)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -82,29 +90,15 @@ class UpdateDestroyReplyAPIView(DestroyAPIView, UpdateAPIView):
     queryset = Reply.objects.all()
     lookup_url_kwarg = 'reply_pk'
     serializer_class = CommentSerializer
-    NO_COMMENT_ID = Response({
-        'error': 'Comment with that ID not found',
-    }, status=status.HTTP_404_NOT_FOUND)
-    NO_ARTICLE_SLUG = Response({
-        'error': 'Article with that slug not found',
-    }, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, article_slug=None, comment_pk=None, reply_pk=None):
         """
         delete comment with comment_id of article with specified slug
         """
-        try:
-            Comment.objects.get(pk=comment_pk)
-            Article.objects.get(article_slug=article_slug)
-            reply = Reply.objects.get(pk=reply_pk)
-        except Comment.DoesNotExist:
-            return self.NO_COMMENT_ID
-        except Article.DoesNotExist:
-            return self.NO_ARTICLE_SLUG
-        except Reply.DoesNotExist:
-            return Response({
-                'error': 'Reply with that ID not found',
-            }, status=status.HTTP_404_NOT_FOUND)
+        response = CommentReplyChecker.check_exists(comment_pk, article_slug, reply_pk)
+        if not isinstance(response, list):
+            return response
+        reply = response[2]
         reply.delete()
         return Response({
             'message': 'Reply deleted successfully',
@@ -115,18 +109,10 @@ class UpdateDestroyReplyAPIView(DestroyAPIView, UpdateAPIView):
         update comment with comment_id or artcle_slug
         """
         reply_data = request.data.get('reply', {})
-        try:
-            Article.objects.get(article_slug=article_slug)
-            Comment.objects.get(pk=comment_pk)
-            reply = Reply.objects.get(pk=reply_pk)
-        except Article.DoesNotExist:
-            return self.NO_ARTICLE_SLUG
-        except Comment.DoesNotExist:
-            return self.NO_COMMENT_ID
-        except Reply.DoesNotExist:
-            return Response({
-                'error': 'Reply with that ID not found',
-            }, status=status.HTTP_404_NOT_FOUND)
+        resp = CommentReplyChecker.check_exists(comment_pk, article_slug, reply_pk)
+        if not isinstance(resp, list):
+            return resp
+        reply = resp[2]
         serializer = ReplySerializer(instance=reply, data=reply_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -134,4 +120,3 @@ class UpdateDestroyReplyAPIView(DestroyAPIView, UpdateAPIView):
             'message': 'Reply Updated Successfully',
             'reply': serializer.data
         }, status=status.HTTP_200_OK)
-

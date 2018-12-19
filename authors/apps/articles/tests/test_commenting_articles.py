@@ -102,7 +102,7 @@ class TestComments(BaseTestCase):
         )
         response = self.get_comments(token, invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['error'], 'Article with this slug not found')
+        self.assertEqual(response.data['error'], 'Article with that slug not found')
 
     # test updating comment
     def test_updating_a_comment(self):
@@ -155,7 +155,7 @@ class TestComments(BaseTestCase):
                 HTTP_AUTHORIZATION=token
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['error'], 'Comment with this ID not found')
+        self.assertEqual(response.data['error'], 'Comment with that ID not found')
 
     def test_non_logged_in_user_cannot_update(self):
         """ Test a user has to login before updating. """
@@ -239,7 +239,7 @@ class TestComments(BaseTestCase):
             data=self.comment_data2,
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['error'], 'Article with this slug not found')
+        self.assertEqual(response.data['error'], 'Article with that slug not found')
 
     def test_deleting_comment_for_non_exisiting_article_slug(self):
         """

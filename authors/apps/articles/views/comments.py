@@ -1,12 +1,14 @@
+from copy import deepcopy
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import ListCreateAPIView, DestroyAPIView, UpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from authors.apps.articles.models import Comment, Article
-from authors.apps.articles.serializers import CommentSerializer
+from authors.apps.articles.models import Comment, Article, CommentEditHistory
+from authors.apps.articles.serializers import CommentSerializer, CommentEditHistorySerializer
 from authors.apps.notifications.models import favorites_notification
 
 
@@ -95,7 +97,7 @@ class CommentsListAPIView(ListCreateAPIView):
         article = Article.objects.filter(article_slug=article_slug).first()
         if article is None:
             return Response({
-                'error': 'Article with this slug not found'
+                'error': 'Article with that slug not found'
             }, status=status.HTTP_404_NOT_FOUND)
         filters = {
             self.lookup_field: self.kwargs[self.lookup_url_kwarg]
@@ -181,15 +183,53 @@ class UpdateDestroyCommentsAPIView(DestroyAPIView, UpdateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Comment.objects.all()
     lookup_url_kwarg = 'comment_pk'
-    serializer_class = CommentSerializer
+    serializer_class = CommentSerializer, CommentEditHistorySerializer
 
     def destroy(self, request, article_slug=None, comment_pk=None):
         """
         delete comment with comment_id of article with specified slug
         """
+        response = UpdateDestroyCommentsAPIView.check_exists(article_slug, comment_pk)
+        if not isinstance(response, list):
+            return response
+        comment = response[1]
+        response = UpdateDestroyCommentsAPIView.check_can_do_action(comment, request,
+                                                                    "You can only delete your comment.")
+        if response is not None:
+            return response
+        comment.delete()
+        return Response({
+            'message': 'Comment deleted successfully', }, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def check_can_do_action(comment, request, message):
+        if request.user.pk != comment.author_id:
+            return Response({'error': message},
+                            status=status.HTTP_403_FORBIDDEN)
+
+    def get(self, request, **kwargs):
+        """Get a single comment"""
+        slug = kwargs.get("article_slug")
+        comment_id = kwargs.get("comment_pk")
+        response = UpdateDestroyCommentsAPIView.check_exists(slug, comment_id)
+        if not isinstance(response, list):
+            return response
+        comment = response[1]
+        edits = CommentEditHistory.objects.filter(comment=comment).order_by('comment__created_at')
+        serialized_comment = CommentSerializer(comment)
+        serialized = CommentEditHistorySerializer(edits, many=True)
+        final = dict()
+        final.update({"comment": serialized_comment.data})
+        if serialized.data:
+            final.update({"previous_versions": serialized.data})
+        return Response(final, status=status.HTTP_200_OK)
+
+    @staticmethod
+    def check_exists(article_slug, comment_pk):
         try:
-            comment = Comment.objects.get(pk=comment_pk)
             article = Article.objects.get(article_slug=article_slug)
+            comment = Comment.objects.get(pk=comment_pk, article=article)
+            return [article, comment]
         except Comment.DoesNotExist:
             return Response({
                 'error': 'Comment with that ID not found',
@@ -198,32 +238,42 @@ class UpdateDestroyCommentsAPIView(DestroyAPIView, UpdateAPIView):
             return Response({
                 'error': 'Article with that slug not found',
             }, status=status.HTTP_404_NOT_FOUND)
-        comment.delete()
-        return Response({
-            'message': 'Comment deleted successfully',
-        }, status=status.HTTP_200_OK)
 
     def update(self, request, article_slug=None, comment_pk=None):
         """
-        update comment with comment_id or artcle_slug
+        update comment with comment_id or article_slug
         """
         comment_data = request.data.get('comment', {})
-        try:
-            article = Article.objects.get(article_slug=article_slug)
-            comment = Comment.objects.get(pk=comment_pk)
-        except Article.DoesNotExist:
-            return Response({
-                'error': 'Article with this slug not found'
-            }, status=status.HTTP_404_NOT_FOUND)
-        except Comment.DoesNotExist:
-            return Response({
-                'error': 'Comment with this ID not found'
-            }, status=status.HTTP_404_NOT_FOUND)
+        res = UpdateDestroyCommentsAPIView.check_exists(article_slug, comment_pk)
+        if not isinstance(res, list):
+            return res
+        comment = res[1]
+        resp = UpdateDestroyCommentsAPIView.check_can_do_action(
+            comment,
+            request,
+            "You can only update your comment.")
+        if resp:
+            return resp
+        # Set the old body of the comment for use
+        # later in checking if the comment isn't changing at all
+        # Use deep copy to make a copy so a change in the
+        # comment.body doesn't change the old_comment_body
+        old_comment_body = deepcopy(comment.body)
         serializer = CommentSerializer(instance=comment, data=comment_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({
-            'message': 'Comment Updated Successfully',
-            'comment': serializer.data
-        }, status=status.HTTP_200_OK)
+        returned_data = {
+            "message": "Comment Updated Successfully",
+            "comment": serializer.data
+        }
+        if comment_data.get("body") != old_comment_body:
+            # Just don't save at this point because the new comment
+            # is the same as what we have with us
+            old_comment = CommentEditHistory(body=old_comment_body,
+                                             comment=comment)
+            old_comment.save()
+            previous = serializer.data
+            previous.update({"body": old_comment_body})
+            returned_data.update({"previous_version": previous})
 
+        return Response(returned_data, status=status.HTTP_200_OK)
