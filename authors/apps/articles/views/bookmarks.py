@@ -1,8 +1,9 @@
-from rest_framework.generics import CreateAPIView, ListAPIView
-from authors.apps.articles.models import BookMarkArticle, Article
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.response import Response
+
 from authors.apps.articles.exceptions import ArticleNotFound
+from authors.apps.articles.models import Article, BookMarkArticle
 from authors.apps.articles.serializers import BookMarkArticleSerializer
 
 
@@ -35,7 +36,7 @@ class BookMarkCreateAPIView(CreateAPIView):
         return Response(
             {
                 'message': 'Article bookmarked successfully',
-            }, 
+            },
             status=status.HTTP_201_CREATED,
         ) if created else \
             Response(
@@ -44,6 +45,7 @@ class BookMarkCreateAPIView(CreateAPIView):
                 },
                 status=status.HTTP_200_OK
             )
+
 
 class BookMarkListAPIView(ListAPIView):
     """
@@ -70,3 +72,4 @@ class BookMarkListAPIView(ListAPIView):
                 },
                 status=status.HTTP_200_OK
             )
+

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'social_django',
     'taggit',
+    'authors.apps.notifications',
 ]
 
 MIDDLEWARE = [
