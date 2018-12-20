@@ -21,6 +21,7 @@ class BaseTestCase(TestCase):
         self.comment_url = ''#reverse("articles:comment")
         self.favoritearticle_url = reverse("articles:favorite", kwargs={'slug':"salma123445"})
 
+
         self.register_data = {
                                     "user":{
                                 "username": "JohnDoe",
@@ -300,3 +301,9 @@ class BaseTestCase(TestCase):
             url,
             HTTP_AUTHORIZATION=token,
         )
+
+    def get_share_endpoint(self, share_to):
+        article_url, saved_article, token = self.create_article()
+        slug = saved_article.data['slug']
+        link = reverse("articles:share", kwargs={'slug': slug, 'share_to': share_to})
+        return link, token
