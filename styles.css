@@ -222,3 +222,7 @@ div [class*="right float"] {
     border-radius: 10em;
     height: 28px;
 }
+
+a.red{
+    color:#67bd45!important;
+}

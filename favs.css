@@ -1,0 +1,68 @@
+.flexbox {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.fav-btn {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes fav_me-anime {
+    0% {
+        opacity: 1;
+        font-size: 1rem;
+        -webkit-text-stroke-color: transparent;
+    }
+    25% {
+        opacity: .6;
+        color: #FFF;
+        font-size: 0.8rem;
+        -webkit-text-stroke-width: 1px;
+        -webkit-text-stroke-color: #67bd45;
+    }
+    75% {
+        opacity: .6;
+        color: #FFF;
+        font-size: 1.42875rem;
+        -webkit-text-stroke-width: 1px;
+        -webkit-text-stroke-color: #67bd45;
+    }
+    100% {
+        opacity: 1;
+        font-size: 1.25rem;
+        -webkit-text-stroke-color: transparent;
+    }
+}
+@keyframes fav_me-hover {
+    from {
+        font-size: 1.42875rem;
+    }
+    80% {
+        font-size: 1.25rem;
+    }
+}
+.fav_me {
+    display: block;
+    font-size: 1.25rem;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+    box-shadow: none;
+    transition: all .2s ease;
+    color: #CBCDCE;
+    margin: 0;
+}
+.fav_me.active {
+    color: #67bd45;
+}
+.fav_me:hover {
+    animation: favme-hover .3s infinite alternate;
+}
+.fav_me.is_animating {
+    animation: favme-anime .3s;
+}

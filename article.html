@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
     <link href="https://fonts.googleapis.com/css?family=Lora|Quicksand" rel="stylesheet">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="favs.css">
     <title>Articles | AuthorsHaven</title>
 </head>        
     <body>
@@ -53,23 +55,30 @@
                     </a>
                     <a href="profile.html" class="item">
                     <i class="user outline icon"></i> Profile
-                    </a>
-                    <a href="index.html" class="item">
+                </a>
+                <a href="index.html" class="item">
                     <i class="clone layout icon"></i> Articles
-                    </a>
-                    <a href="myarticles.html" class="item">
-                        <i class="plus outline circle layout icon"></i> Mine
-                    </a>
-                    <a href="createarticle.html" class="item">
-                        <i class="plus circle layout icon"></i> Publish
-                    </a>
-                    <a href="profile_list.html" class="item">
+                </a>
+                <a href="myarticles.html" class="item">
+                    <i class="user layout icon"></i> Mine
+                </a>
+                <a href="bookmarks.html" class="item">
+                    <i class="bookmark layout icon"></i> Bookmarks
+                </a>
+                <a href="favorites.html" class="item">
+                    <i class="star layout icon"></i> Favorites
+                </a>
+                <a href="createarticle.html" class="item">
+                    <i class="plus circle layout icon"></i> Publish
+                </a>
+                <a href="profile_list.html" class="item">
                     <i class="users icon"></i> Profiles
-                    </a>
-                    <a href="login.html" class="item">
+                </a>
+                <a href="login.html" class="item">
                     <i class="logout icon"></i> Logout
-                    </a>
+                </a>
             </div>
+
             <div class="pusher">
                 <div class="ui container">
                         
@@ -80,10 +89,14 @@
                         <p class="small"><strong><i class="clock icon"></i></strong>3 min</p>
                         <a class="follow"><div class="ui label space-bottom">
                             <i class="users icon"></i> 31 Followers
+
                         </div></a>
                         <div class="right float same-line">
                             <p class="bold">Rate article</p>
                           <div class="ui rating" data-rating="3" data-max-rating="5"></div>
+                            <!-- Here -->
+
+                            <!-- Here -->
                         </div>
                         <img src="https://placeimg.com/1000/500/any" alt="" class="ui space centered fluid image">
                         <div class="ui centered grid ">
@@ -91,9 +104,9 @@
                                 <p class="paragraph">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, ipsam earum! Dignissimos placeat quia veritatis natus, expedita eius nihil sunt consectetur quibusdam laboriosam facilis vel ut? Cumque nostrum consequuntur expedita odio. Assumenda hic facere ipsam enim sapiente explicabo nesciunt amet reprehenderit excepturi, voluptatibus esse. Veritatis, harum. Porro unde soluta quod!</p>
                                 <p class="paragraph">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, ipsam earum! Dignissimos placeat quia veritatis natus, expedita eius nihil sunt consectetur quibusdam laboriosam facilis vel ut? Cumque nostrum consequuntur expedita odio. Assumenda hic facere ipsam enim sapiente explicabo nesciunt amet reprehenderit excepturi, voluptatibus esse. Veritatis, harum. Porro unde soluta quod!</p>
                                 <p class="paragraph">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia, ipsam earum! Dignissimos placeat quia veritatis natus, expedita eius nihil sunt consectetur quibusdam laboriosam facilis vel ut? Cumque nostrum consequuntur expedita odio. Assumenda hic facere ipsam enim sapiente explicabo nesciunt amet reprehenderit excepturi, voluptatibus esse. Veritatis, harum. Porro unde soluta quod!</p>
-                            </div>                            
-                       </div>
+                            </div>
 
+                       </div>
                         <div class="ui grid">
                         <div class="ui four column row">
                         <div class="ui left floated column">
@@ -204,7 +217,8 @@
                         <span class="date">5 days ago</span>
                         </div>
                         <div class="text">
-                        Dude, this is awesome. Thanks so much
+                        Dude, this is awesome. Thanks so much (<a class="ui red text" href="#">Edited</a>) &nbsp;&nbsp;&nbsp;<a href="#">Edit</a>
+
                         </div>
                         <div class="actions">
                         <a class="reply">Reply</a>
@@ -248,10 +262,11 @@
                 </div>
         </div>
 
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>  -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script> -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+        <script src="quoteShare.js"></script>
         <script src="script.js"></script>
 </body>
 </html>

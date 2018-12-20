@@ -28,8 +28,14 @@ $('.ui.rating')
 ;
 try {
     var simplemde = new SimpleMDE();
+    simplemde.value("This text will appear in the editor");
 }catch (e) {
 
+}
+try {
+    $('.paragraph').quoteShare()
+}catch (e) {
+  console.log(e);
 }
 
 $('.ui.dropdown')
@@ -61,3 +67,20 @@ $('.ui.dropdown')
 $('.ui.modal')
   .modal('show')
 ;
+
+
+// Favorite Button - Heart
+$('.fav_me').click(function() {
+    $(this).toggleClass('active');
+});
+
+/* when a user clicks, toggle the 'is-animating' class */
+$(".fav_me").on('click touchstart', function(){
+    $(this).toggleClass('is_animating');
+});
+
+/*when the animation is over, remove the class*/
+$(".fav_me").on('animationend', function(){
+    $(this).toggleClass('is_animating');
+});
+
