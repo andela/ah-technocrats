@@ -9,6 +9,11 @@
     
 }
 
+.nav-image {
+    width: 300px;
+    max-width: initial !important;
+}
+
 .image-login {
     width: 300px;
     margin: 0 auto;
@@ -44,11 +49,26 @@
     box-shadow: 0 6px 6px -6px #777;
 }
 
+.nav-height {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    justify-content: space-between;
+}
+
 
 .toggle {
     display: none;
 }
 
+.search-input {
+    margin-top: 20px !important;
+   margin-right: 100px
+}
+
+.menu-bar {
+    margin-top: 20px !important;
+}
 .pad {
     margin-top:100px;
 }
@@ -196,4 +216,9 @@ div [class*="right float"] {
 }
 .radio-space {
     margin-top:10px;
+}
+
+.ui.circular.button {
+    border-radius: 10em;
+    height: 28px;
 }

@@ -38,17 +38,26 @@ $('.ui.dropdown')
   })
 ;
 
+// $('.ui.modal')
+//   .modal({
+//     closable  : false,
+//     onDeny    : function(){
+//       window.alert('Wait not yet!');
+//       return false;
+//     },
+//     onApprove : function() {
+//       window.alert('Approved!');
+//     }
+//   })
+//   .modal('show')
+// ;
+
+// $('#search').click(function(){
+//   $('.ui.modal')
+//   .modal('show')
+// ;
+// });
+
 $('.ui.modal')
-  .modal({
-    closable  : false,
-    onDeny    : function(){
-      window.alert('Wait not yet!');
-      return false;
-    },
-    onApprove : function() {
-      window.alert('Approved!');
-    }
-  })
   .modal('show')
 ;
-

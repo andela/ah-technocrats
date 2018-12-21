@@ -11,9 +11,27 @@
     <link rel="stylesheet" href="styles.css">
     <title>Articles | AuthorsHaven</title>
 </head>        
-    <body>       
-
-        <div class="ui top borderless attached nav  menu">
+    <body>
+        
+        <div class="ui grid top borderless attached nav menu">
+            <div class="ui three nav-height column row">
+                <div class="column menu-bar">
+                <a class="item">
+                    <i class="sidebar icon"></i> Menu
+                </a>
+                </div>
+                <div class="centered column">
+                    <img class="nav-image" src="img/ah-logo-wide.svg" alt="">
+                </div>
+                <div class="right search-input floated column">
+                    <div class="ui icon centered input">
+                        <input type="text" placeholder="Search...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="ui top borderless attached nav  menu">
             <a class="item">
                 <i class="sidebar icon"></i> Menu
             </a>
@@ -22,11 +40,17 @@
                 <img class="image logo" src="img/ah-logo-wide.svg" alt="">
                 <img class="image logo-small" src="img/ah.logo-square.svg" alt="">
             </div>
-            
-        </div>
+            <div class="ui icon centered input">
+                            <input type="text" placeholder="Search...">
+                            <i class="search icon"></i>
+                        </div>
+        </div> -->
 
         <div class="ui bottom attached segment">
             <div class="ui inverted green labeled icon left inline vertical demo sidebar menu">
+                    <a id="search" href="" class="item">
+                        <i class="search icon"></i> Search
+                    </a>
                     <a href="profile.html" class="item">
                     <i class="user outline icon"></i> Profile
                     </a>
@@ -48,11 +72,12 @@
             </div>
             <div class="pusher">
                 <div class="ui container">
+                        
                     <div class="ui space borderless">
                         
                         <h1 class="increase-size">A must read article that could be about anything, really.</h1>
                         <p class="small"><strong>Written By: </strong>Jake the Author</p>
-
+                        <p class="small"><strong><i class="clock icon"></i></strong>3 min</p>
                         <a class="follow"><div class="ui label space-bottom">
                             <i class="users icon"></i> 31 Followers
                         </div></a>
@@ -70,8 +95,8 @@
                        </div>
 
                         <div class="ui grid">
-                        <div class="four column row">
-                        <div class="left floated column">
+                        <div class="ui four column row">
+                        <div class="ui left floated column">
                             <div class="ui divided items">
                             <div class="item">
                             <div class="ui tiny image">
@@ -84,28 +109,37 @@
                         </div>
 
                         </div>
-                        <div class="right floated column">
-                            <a href=""><button class="ui tiny circular red button">
-                            <i class="heart icon"></i>
-                                 <span> Like</span>
-                            </button></a>
-                            <button class="ui tiny circular yellow icon button">
+                        <div class=" ui right floated column inline" style="display: contents;">
+                            <button class="ui tiny toggle circular green button">
+                            <i class="thumbs up icon"></i>
+                                 <span> Like 12</span>
+                            </button>
+                            <button class="ui tiny toggle circular red button">
+                                <i class="thumbs down icon"></i>
+                                     <span> Dislike 1</span>
+                            </button>
+                            <button class="ui tiny circular yellow button">
                             <i class="star icon"></i>
                                 <span>  Favorite</span>
                             </button>
+                            <button class="ui tiny circular yellow button">
+                                <i class="bookmark icon"></i>
+                                    <span>  Bookmark</span>
+                                </button>
                             <a href="report_article.html"><button class="ui tiny circular blue icon button">
                             <i class="eye icon"></i>
                                 <span>  Report</span>
                             </button></a>
-
                         </div>
-                        <div class="row">
-                        <div class="three wide column"></div>
-                        <div class="eight wide column"></div>
-                        <div class="five wide column"></div>
+                        </div>                
                         </div>
+                        <div class="tag space">
+                            Tags:
+                            <a class="ui tag label">New</a>
+                            <a class="ui red tag label">Upcoming</a>
+                            <a class="ui teal tag label">Featured</a>
                         </div>
-                        <div class="ui space-bottom comments">
+                        <div class="ui space space-bottom comments">
                         <h3 class="ui dividing header">Comments</h3>
                         <div class="comment">
                         <a class="avatar">
@@ -185,16 +219,12 @@
                         <i class="icon edit"></i> Add Reply
                         </div>
                         </form>
-                        </div>
-                    </div>
+                        </div>           
                     
                 </div>
-                
-
-
             </div>
         </div>
-            <div class="footer">
+            <div class="space footer">
                     <div class="ui two column centered grid">
                     <div class="column"></div>
                     <div class="four column centered row">
@@ -216,6 +246,8 @@
                             Authors Haven &copy; 2018 All rights reserved.
                     </h6>
                 </div>
+        </div>
+
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>  -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script> -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
