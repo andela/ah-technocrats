@@ -12,6 +12,7 @@ from authors.apps.articles.views.like_dislike_comments import (
     DislikeComment,
 )
     
+from authors.apps.articles.views.sharing import ShareArticleAPIView
 
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),
@@ -30,4 +31,5 @@ urlpatterns = [
     path('articles/bookmarks/', BookMarkListAPIView.as_view(), name='get-bookmarks'),
     path('comments/<int:comment_pk>/like/', LikeComment.as_view(), name='like-comment'),
     path('comments/<int:comment_pk>/dislike/', DislikeComment.as_view(), name='dislike-comment'),
+    path('articles/<str:slug>/share/<str:share_to>/', ShareArticleAPIView.as_view(), name='share'),
 ]
