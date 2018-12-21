@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,6 +26,19 @@ def notify_followers(sender, instance, created, **kwargs):
     if created:
         message = (instance.title + " has been successfully created by " + instance.author.username)
         follower_notification(instance.author, message, instance)
+
+
+def estimate_time(body):
+    """method that estimates the read time"""
+    read_rate = 180
+    total_words = len(body.split())
+    reading_speed = total_words / read_rate  # calculates the speed in minutes
+    # returns 1 for articles taking less than a minute to read
+    if reading_speed <= 1:
+        return 1
+    else:
+        time_in_mins = int(round(reading_speed))
+    return time_in_mins
 
 
 class ArticleAPIView(APIView):
@@ -121,15 +134,28 @@ class ArticleAPIView(APIView):
         """
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
+        if articles:
+            result = []
+            for article in articles:
+                individual = dict()
+                serializer = ArticleAuthorSerializer(article)
+                individual.update(ArticleAuthorSerializer(article).data)
+                individual.update({"read_time": estimate_time(serializer.data.get('body', ''))})
+                individual.update({"rating": article.just_average})
+                result.append(individual)
+            message = {'message': "Articles found.", 'articles': result}
+            return Response(message, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': "Articles not found"})
 
 
-class SpecificArticleAPIView(APIView):
+class SpecificArticleAPIView(RetrieveUpdateAPIView):
     """
     Class for handling a single article.
     """
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
 
-    def get(self, request, slug):
+    def retrieve(self, request, slug):
         """
         Method for getting one article.
         """
@@ -138,12 +164,13 @@ class SpecificArticleAPIView(APIView):
         serializer = ArticleAuthorSerializer(article)
         final.update(serializer.data)
         final.update({"rating": article.rating})
+        final.update({"read_time": estimate_time(serializer.data.get('body', ''))})
         message = {'message': "Article found.", 'article': final}
         if article is None:
             return Response({"message": "Article not found, Please check your slug"}, status=status.HTTP_404_NOT_FOUND)
         return Response(message, status=status.HTTP_200_OK)
 
-    def put(self, request, slug):
+    def update(self, request, slug):
 
         """
         Method for editing an article.
@@ -159,10 +186,11 @@ class SpecificArticleAPIView(APIView):
         data = request.data.get('article')
         serializer = ArticleSerializer(instance=article, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
-        article = serializer.save()
+        serializer.save()
         message = {
             'message': "Article has been successfully updated.",
-            'article_title': article.title
+            'article_title': serializer.data['title'],
+            'article_slug': serializer.data['article_slug']
         }
         return Response(message, status=status.HTTP_200_OK)
 
@@ -241,7 +269,7 @@ class DislikeArticle(UpdateAPIView):
         liked = bool(user in article.like.all())
         if liked is True:
             article.like.remove(user.id)
-            
+
         article.dislike.add(user.id)
         message = {"article": "You have disliked this article"}
         return Response(message, status.HTTP_200_OK)

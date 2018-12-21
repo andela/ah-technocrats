@@ -7,6 +7,7 @@ from ..authentication.models import User
 from ..authentication.serializers import UserSerializer
 
 
+
 class ArticleTagSerializer(serializers.Field):
     """
     class for handling article tags serialization.
@@ -40,7 +41,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         Method defines what fields of an article object should be displayed.
         """
         model = Article
-        fields = ("title", "description", "body", "author", "tags")
+        fields = ("title", "description", "body", "author", "tags", "article_slug")
 
     def validate_tagList(self, validated_data):
         if type(validated_data) is not list:
@@ -66,12 +67,12 @@ class ArticleSerializer(serializers.ModelSerializer):
         instance.description = data.get('description', instance.description)
         instance.body = data.get('body', instance.body)
         instance.author_id = data.get('authors_id', instance.author_id)
-        if 'tagList' not in data:
+        if 'tags' not in data:
             return instance
-        instance.tagList = data.get('tagList')
+        instance.tags = data.get('tags')
         article = Article.objects.get(pk=instance.pk)
-        article.tagList.set(*instance.tagList, clear=True)
-        # instance.save()
+        article.tags.set(*instance.tags, clear=True)
+        instance.save()
         return instance
 
     def get_author(self, Article):
@@ -96,6 +97,7 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     dislike = serializers.SerializerMethodField(method_name='dislike_article')
     rating = serializers.SerializerMethodField(method_name='show_rating')
     
+
     def show_tags(self, instance):
         """
         Show tag details.
