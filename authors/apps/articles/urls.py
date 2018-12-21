@@ -1,5 +1,6 @@
 from django.urls import path
 
+
 from authors.apps.articles.views.articles import ArticleAPIView, SpecificArticleAPIView, LikeArticle, DislikeArticle
 from authors.apps.articles.views.bookmarks import BookMarkCreateAPIView, BookMarkListAPIView
 from authors.apps.articles.views.comments import CommentsListAPIView, UpdateDestroyCommentsAPIView
@@ -13,6 +14,8 @@ from authors.apps.articles.views.like_dislike_comments import (
 )
     
 from authors.apps.articles.views.sharing import ShareArticleAPIView
+from authors.apps.articles.views.filters import FilterSearchViewset
+
 
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),
@@ -32,4 +35,6 @@ urlpatterns = [
     path('comments/<int:comment_pk>/like/', LikeComment.as_view(), name='like-comment'),
     path('comments/<int:comment_pk>/dislike/', DislikeComment.as_view(), name='dislike-comment'),
     path('articles/<str:slug>/share/<str:share_to>/', ShareArticleAPIView.as_view(), name='share'),
+    path('article/', FilterSearchViewset.as_view({'get': 'list'}), name='filter'),
+
 ]

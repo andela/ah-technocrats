@@ -20,6 +20,7 @@ class BaseTestCase(TestCase):
         self.bookmarks_url = reverse('articles:get-bookmarks')
         self.comment_url = ''#reverse("articles:comment")
         self.favoritearticle_url = reverse("articles:favorite", kwargs={'slug':"salma123445"})
+        self.filter_url = reverse("articles:filter")
 
 
         self.register_data = {
