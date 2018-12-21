@@ -2,18 +2,19 @@ from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 
 from authors.apps.profiles.serializers import ProfileSerializer
-from .models import Article, Rating, ReportArticle, Comment, Reply, BookMarkArticle
-from ..authentication.serializers import UserSerializer
+from .models import Article, Rating, ReportArticle, Comment, Reply, BookMarkArticle, CommentEditHistory
 from ..authentication.models import User
-from rest_framework.validators import UniqueTogetherValidator
+from ..authentication.serializers import UserSerializer
+
 
 class ArticleTagSerializer(serializers.Field):
     """
     class for handling article tags serialization.
     """
+
     def to_internal_value(self, data):
         if type(data) is not list:
-            raise ParseError("Expect 'tags' to be a list." )
+            raise ParseError("Expect 'tags' to be a list.")
         return data
 
     def to_representation(self, obj):
@@ -33,7 +34,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     author = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
-  
+
     class Meta:
         """
         Method defines what fields of an article object should be displayed.
@@ -89,7 +90,7 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     body = serializers.CharField()
-    author = UserSerializer(read_only = True)
+    author = UserSerializer(read_only=True)
     tags = serializers.SerializerMethodField(method_name='show_tags')
     like = serializers.SerializerMethodField(method_name='like_article')
     dislike = serializers.SerializerMethodField(method_name='dislike_article')
@@ -120,7 +121,6 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
         if request is not None and request.user.is_authenticated:
             user_id = request.user.id
         return {'dislikeCount': instance.dislike.count()}
-
 
     def favorite(self, instance):
         """favorite an article"""
@@ -262,15 +262,24 @@ class ReportArticleSerializer(serializers.ModelSerializer):
         model = ReportArticle
         fields = ('article', 'reported_by', 'report')
 
+
 class BookMarkArticleSerializer(serializers.ModelSerializer):
     """
     class to serialize bookmarked articles
     """
     article_slug = serializers.CharField(source='article.article_slug')
+
     class Meta:
         model = BookMarkArticle
         fields = [
             'article_slug',
             'id'
         ]
-        
+
+class CommentEditHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentEditHistory
+        fields = [
+            'body',
+            'updated_at'
+        ]

@@ -41,7 +41,7 @@ class TestCommentReply(BaseTestCase):
             HTTP_AUTHORIZATION=token
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['error'], 'Comment with that ID does not exist')
+        self.assertEqual(response.data['error'], 'Comment with this ID not found')
 
     def test_replying_to_article_comment_with_invalid_article_slug(self):
         """
@@ -54,7 +54,7 @@ class TestCommentReply(BaseTestCase):
         url = reverse(
             "articles:list-create-reply",
             kwargs={
-                "article_slug": 'non-existing-article-slug',
+                "article_slug": 'non-existing-article-slugs',
                 'comment_pk': comment_id
             }
         )
@@ -65,7 +65,7 @@ class TestCommentReply(BaseTestCase):
             HTTP_AUTHORIZATION=token
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['error'], 'Article with that slug not found')
+        self.assertEqual(response.data['error'], 'Article with this slug not found')
 
     def test_geting_comment_replies(self):
         """

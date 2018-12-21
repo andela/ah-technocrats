@@ -183,6 +183,7 @@ class BookMarkArticle(models.Model):
     """
     model for holding users bookmarks. Allow user to bookmark an article only once
     """
+
     class Meta:
         """
         allow user to bookmark an article only once
@@ -197,3 +198,15 @@ class BookMarkArticle(models.Model):
         return the name of the bookmarked article
         """
         return self.article.article_slug
+
+
+class CommentEditHistory(models.Model):
+    """Model to hold the comment edit history"""
+    # The only thing needed is just a relationship to the which has been edited
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    body = models.CharField(max_length=1000)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Change the base table name"""
+        db_table = "comment_edits"
