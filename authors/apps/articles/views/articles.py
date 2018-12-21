@@ -8,6 +8,7 @@ from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.settings import api_settings
 
 from authors import settings
 from authors.apps.articles.models import Article
@@ -32,6 +33,7 @@ class ArticleAPIView(APIView):
    Class for handling Article.
    """
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
     def post(self, request):
         """
@@ -83,21 +85,42 @@ class ArticleAPIView(APIView):
 
     def get(self, request):
         """
-       Method for getting all articles.
-       """
-        # It gets a specific article using the slug that is provided in the url
+        Method for getting all articles.
+        """
+        # set up pagination
         articles = Article.objects.all()
-        if articles:
-            result = []
-            for article in articles:
-                individual = dict()
-                individual.update(ArticleAuthorSerializer(article).data)
-                individual.update({"rating": article.just_average})
-                result.append(individual)
-            message = {'message': "Articles found.", 'articles': result}
-            return Response(message, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "Articles not found"})
+        page = self.paginate_queryset(articles)
+        if page is not None:
+            serializer = ArticleAuthorSerializer(page, many=True)
+            message = {'articles': serializer.data}
+            return self.get_paginated_response(message)
+                
+    @property
+    def paginator(self):
+        """
+        define the paginator method.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, articles):
+        """
+        Return the page if the paginator is enabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(articles, self.request, view=self)
+
+    def get_paginated_response(self, data):
+        """
+        Print out the results with the link to previous and next page.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
 
 
 class SpecificArticleAPIView(APIView):

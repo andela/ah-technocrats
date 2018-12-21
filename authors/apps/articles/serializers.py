@@ -93,14 +93,16 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField(method_name='show_tags')
     like = serializers.SerializerMethodField(method_name='like_article')
     dislike = serializers.SerializerMethodField(method_name='dislike_article')
-
-
+    rating = serializers.SerializerMethodField(method_name='show_rating')
+    
     def show_tags(self, instance):
         """
         Show tag details.
         """
         return instance.tags.names()
 
+    def show_rating(self, instance):
+        return instance.just_average
 
     def like_article(self, instance):
         """method to return a user who has liked an article"""
@@ -131,7 +133,6 @@ class ArticleAuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        # fields = ('title', 'description', 'body', 'like', 'dislike', 'favorite','author')
         fields = '__all__'
 
 
@@ -254,3 +255,4 @@ class BookMarkArticleSerializer(serializers.ModelSerializer):
             'article_slug',
             'id'
         ]
+        
