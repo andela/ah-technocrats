@@ -7,6 +7,11 @@ from authors.apps.articles.views.favorites import FavoriteArticles
 from authors.apps.articles.views.ratings import RatingsAPIView
 from authors.apps.articles.views.reply import ReplyListAPIView, UpdateDestroyReplyAPIView
 from authors.apps.articles.views.report_articles import ReportArticleAPIView, ReportListAPIView
+from authors.apps.articles.views.like_dislike_comments import (
+    LikeComment,
+    DislikeComment,
+)
+    
 
 urlpatterns = [
     path('articles/', ArticleAPIView.as_view(), name='articles'),
@@ -23,4 +28,6 @@ urlpatterns = [
     path('articles/reports/', ReportListAPIView.as_view(), name='report-list'),
     path('articles/<str:article_slug>/bookmark/', BookMarkCreateAPIView.as_view(), name='bookmark-article'),
     path('articles/bookmarks/', BookMarkListAPIView.as_view(), name='get-bookmarks'),
+    path('comments/<int:comment_pk>/like/', LikeComment.as_view(), name='like-comment'),
+    path('comments/<int:comment_pk>/dislike/', DislikeComment.as_view(), name='dislike-comment'),
 ]

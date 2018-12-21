@@ -22,7 +22,7 @@ class BookMarkCreateAPIView(CreateAPIView):
         try:
             article = Article.objects.get(article_slug=article_slug)
         except Article.DoesNotExist:
-            raise ArticleNotFound()
+            raise ArticleNotFound
         bookmark, created = BookMarkArticle.objects.get_or_create(
             user=user,
             article=article
