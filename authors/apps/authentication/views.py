@@ -1,4 +1,5 @@
 import datetime
+import os
 import jwt
 from django.conf import settings
 from django.core.mail import send_mail
@@ -50,18 +51,16 @@ class RegistrationAPIView(APIView):
         # Set-up mail for verification
         # An email will be sent to the user so that they can confirm 
         # The link in the email contains the token that will be decoded
-        if request.is_secure():
-            protocol = "https://"
-        else:
-            protocol = "http://"
+        protocol = "https://" if request.is_secure() else "http://"
         modeled_user = User(
             username=serializer.data.get("username", ''),
             email=serializer.data.get("email", ''),
         )
         # Get the actual token from the model
         token = modeled_user.jwt_token
-        path = reverse('authentication:user-activate', kwargs={'token': token})
-        url = protocol + request.get_host() + path
+        host = os.getenv('FRONTEND_HOST', 'ah-techno.herokuapp.com')
+        path = '/verify?token='+token
+        url = protocol+host+path
         subject = 'Thank you for signing up!'
         message = """ 
                 Welcome. We are glad that you are a part of us. Just one more step and we are good to go.
@@ -77,7 +76,7 @@ class RegistrationAPIView(APIView):
         # Add token and message to the response so we
         # get a JSON object with the token as a return value
         # to the view
-        message2 = {'message': message, 'data': serializer.data, "token": token}
+        message2 = {'message': message, 'data': serializer.data}
         return Response(message2, status=status.HTTP_201_CREATED)
 
 
@@ -95,12 +94,10 @@ class UserActivationAPIView(APIView):
         is_registered.is_active = True
         is_registered.save()
         # send confirmation mail
-        if request.is_secure():
-            protocol = "https://"
-        else:
-            protocol = "http://"
-        path = reverse('authentication:user-login')
-        url = protocol + request.get_host() + path
+        protocol = "https://" if request.is_secure() else "http://"
+        host = os.getenv('FRONTEND_HOST', 'ah-techno.herokuapp.com')
+        path = '/login'
+        url = protocol+host + path
         subject = 'Confirmed!!'
         message = """ Welcome to Authors Haven. Stay tuned for amazing reads.\n
         Follow the link bellow to login. \n   {}""".format(url)
@@ -199,13 +196,9 @@ class ForgotPasswordView(APIView):
                 "iat": datetime.datetime.now(),
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
             }, settings.SECRET_KEY, algorithm='HS256').decode()
-
-            if request.is_secure():
-                protocol = "https://"
-            else:
-                protocol = "http://"
-            host = request.get_host()
-            path = reverse("authentication:change_password", kwargs={'token': token})
+            protocol = "https://" if request.is_secure() else "http://"
+            host = os.getenv('FRONTEND_HOST', 'ah-techno.herokuapp.com')
+            path = '/reset-password?token='+token
             url = protocol + host + path
             message = """
                         Click on the link to reset your password.
