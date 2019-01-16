@@ -27,7 +27,7 @@ class TestTokenGeneration(APITestCase):
         # decoded = json.loads(content.data)
         token_from_signup = content.data.get("token", "")
         self.assertEqual(content.status_code, status.HTTP_201_CREATED)
-        self.assertNotEqual(token_from_signup, "")
+        self.assertEqual(token_from_signup, "")
 
     def test_can_get_login_token(self):
         posted = self.client.post(self.REGISTER_URL,

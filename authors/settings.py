@@ -143,6 +143,10 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_WHITELIST = (
     '0.0.0.0:4000',
     'localhost:4000',
+    'localhost:3000',
+    'https://ah-techno.herokuapp.com',
+    'http://ah-techno.herokuapp.com',
+    'ah-techno.herokuapp.com'
 )
 
 # Tell Django about the custom `User` model we created. The string
@@ -176,10 +180,6 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.facebook.FacebookAppOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 
-)
-
-CORS_ORIGIN_WHITELIST = (
-    'localhost:3000',
 )
 
 SWAGGER_SETTINGS = {
