@@ -7,22 +7,23 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     last_login = serializers.CharField(source='user.last_login', allow_blank=True)
     country = serializers.CharField(allow_blank=True, required=False)
-    website = serializers.CharField(allow_blank=True, required=False)
+    website = serializers.URLField(allow_blank=True, required=False)
     phone = serializers.CharField(allow_blank=True, required=False)
     bio = serializers.CharField(allow_blank=True, required=False)
     created_at = serializers.DateTimeField()
-    avatar = serializers.SerializerMethodField()
+    avatar = serializers.URLField(allow_blank=True, required=False)
     notifications_enabled = serializers.BooleanField()
 
     phone = serializers.RegexField(
         regex="^[0-9]",
-        max_length=10,
+        max_length=12,
         min_length=10,
         error_messages={
             "invalid": "This field should only contain numbers.",
             "max_length": "Phone Number cannot be longer than 10 characters",
-            "min_length": "Phone Number cannot be less than 10 characters"
-        }
+            "min_length": "Phone Number cannot be less than 12 characters"
+        },
+        allow_blank=True
     )
 
     class Meta:
@@ -39,8 +40,3 @@ class ProfileSerializer(serializers.ModelSerializer):
             'avatar',
             'notifications_enabled',
         )
-
-    def get_avatar(self, object):
-        """return the user avatar, or default avatar if non is set"""
-        if object.avatar:
-            return object.avatar
