@@ -39,7 +39,7 @@ class TestProfile(BaseTestCase):
             HTTP_AUTHORIZATION='Token '+token,
             data={
                 'user':{
-                    'website':'newwebsite.com',
+                    'website':'http://newwebsite.com',
                     'phone':'0721201048'
                 }
             }
