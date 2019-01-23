@@ -225,6 +225,7 @@ class BaseTestCase(TestCase):
                         self.article_data, format='json', 
                         HTTP_AUTHORIZATION=token)
         slug = saved_article.data['slug']
+        
         article_url = reverse("articles:get_article", kwargs={'slug':slug})
         
         return article_url, saved_article, token
