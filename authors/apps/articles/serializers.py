@@ -32,6 +32,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     body = serializers.CharField()
+    image = serializers.URLField(allow_blank=True, required=False)
     author = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
@@ -41,7 +42,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         Method defines what fields of an article object should be displayed.
         """
         model = Article
-        fields = ("title", "description", "body", "author", "tags", "article_slug")
+        fields = ("title", "description", "body", "author", "tags", "article_slug", "image")
 
     def validate_tagList(self, validated_data):
         if type(validated_data) is not list:
