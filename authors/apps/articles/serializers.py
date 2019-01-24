@@ -60,6 +60,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             article.tags.add(tag)
         return new_article
 
+
     def update(self, instance, data):
         """
         Method enables the editing of an article.
@@ -68,9 +69,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         instance.description = data.get('description', instance.description)
         instance.body = data.get('body', instance.body)
         instance.author_id = data.get('authors_id', instance.author_id)
-        if 'tags' not in data:
-            return instance
-        instance.tags = data.get('tags')
+        instance.tags = data.get('tags') or []
         article = Article.objects.get(pk=instance.pk)
         article.tags.set(*instance.tags, clear=True)
         instance.save()
