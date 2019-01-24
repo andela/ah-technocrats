@@ -69,6 +69,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         instance.description = data.get('description', instance.description)
         instance.body = data.get('body', instance.body)
         instance.author_id = data.get('authors_id', instance.author_id)
+        instance.image = data.get('image', instance.image)
         instance.tags = data.get('tags') or []
         article = Article.objects.get(pk=instance.pk)
         article.tags.set(*instance.tags, clear=True)
