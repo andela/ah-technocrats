@@ -52,7 +52,8 @@ class ReplyListAPIView(ListCreateAPIView):
         data = serializer.data
         return Response({
             'replies': data,
-            'repliesCount': len(data)
+            'repliesCount': len(data),
+            'parentId' : comment_pk
         }, status=status.HTTP_200_OK) if len(data) else \
             Response({
                 'message': 'No replies found for this comment'
